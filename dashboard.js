@@ -47,7 +47,7 @@ logoutButton.addEventListener("click", () => {
             window.location.href = "sign-in.html";
         })
         .catch((error) => {
-            console.error("Error logging out:", error);
+            console.error("Error-logging out:", error);
         });
 });
 
