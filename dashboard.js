@@ -44,10 +44,10 @@ logoutButton.addEventListener("click", () => {
     signOut(auth)
         .then(() => {
             alert("Logged out successfully!");
-            window.location.href = "sign in.html";
+            window.location.href = "sign-in.html";
         })
         .catch((error) => {
-            console.error("Error-logging out:", error);
+            console.error("Error logging out:", error);
         });
 });
 
