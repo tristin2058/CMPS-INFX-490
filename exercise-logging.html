@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Logging</title>
+    <link rel="stylesheet" href="exercise-logging.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="layout">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Exercise Logging</h1>
+                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
+                <!-- Dropdown Menu -->
+                <div class="dropdown">
+                    <button class="dropbtn">Menu <i class="fas fa-caret-down"></i></button>
+                    <div class="dropdown-content">
+                        <a href="dashboard.html" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
+                        <a href="#" id="exerciseLoggingNav"><i class="fas fa-dumbbell"></i> Exercise Logging</a>
+                        <a href="#" id="profileNav"><i class="fas fa-user"></i> Profile</a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Log Your Exercise Section -->
+            <section class="log-exercise">
+                <div class="exercise-card">
+                    <h2>Log Your Exercise</h2>
+                    <div class="exercise-inputs">
+                        <div class="input-box">
+                            <label for="exerciseType">Exercise Type:</label>
+                            <select id="exerciseType" required>
+                                <option value="cardio">Cardio</option>
+                                <option value="workouts">Workouts</option>
+                            </select>
+                        </div>
+                        <div id="dynamicInputs">
+                            <!-- Dynamic input fields will be inserted here -->
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save-exercise">Save Exercise</button>
+                    <button type="button" class="btn-undo-exercise" style="display: none;">Undo Last Entry</button>
+                </div>
+            </section>
+
+            <!-- Exercise Overview Section -->
+            <section class="overview">
+                <h2>Exercise Overview</h2>
+                <div class="metrics">
+                    <div class="metric-card">
+                        <h3>Exercise</h3>
+                        <p id="exerciseDisplay">🏋️ None</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Duration</h3>
+                        <p id="durationDisplay">⏱️ 0 mins</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Your Profile</h2>
+            <p id="userEmail">Loading...</p>
+            <button id="logoutButton" class="btn-danger">Logout</button>
+            <button id="closeProfile" class="btn-secondary">Cancel</button>
+        </div>
+    </div>
+
+    <script type="module" src="exercise-logging.js"></script>
+</body>
+</html>
