@@ -40,8 +40,27 @@
                         </div>
                         <div class="input-box">
                             <label for="caloriesBurned">Calories Burned:</label>
-                            <input type="number" id="caloriesBurned" placeholder="Enter calories burned" required>
-                        </div>
+<!-- Track Your Health Section -->
+<section class="track-health">
+    <div class="health-card">
+        <h2>Track Your Health</h2>
+        <div class="health-inputs">
+            <div class="input-box">
+                <label for="steps">Steps:</label>
+                <input type="number" id="steps" placeholder="Enter steps" required>
+            </div>
+            <div class="input-box">
+                <label for="caloriesBurnedDisplay">Calories Burned:</label>
+                <p id="caloriesBurnedDisplay">0 kcal</p>
+            </div>
+            <div class="input-box">
+                <label for="waterIntake">Water Intake (L):</label>
+                <input type="number" id="waterIntake" step="0.1" placeholder="Enter water intake" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-save">Save Data</button>
+    </div>
+</section>                        </div>
                         <div class="input-box">
                             <label for="waterIntake">Water Intake (L):</label>
                             <input type="number" id="waterIntake" step="0.1" placeholder="Enter water intake" required>
