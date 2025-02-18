@@ -13,7 +13,6 @@ import {
 
 // Select input fields and buttons
 const stepsInput = document.getElementById("steps");
-const caloriesInput = document.getElementById("caloriesBurned");
 const waterInput = document.getElementById("waterIntake");
 const saveButton = document.querySelector(".btn-save");
 
@@ -61,7 +60,7 @@ const calculateCaloriesFromSteps = (steps) => {
 stepsInput.addEventListener("input", () => {
     const steps = parseInt(stepsInput.value) || 0;
     const caloriesBurned = calculateCaloriesFromSteps(steps);
-    caloriesInput.value = caloriesBurned.toFixed(2); // Update calories input field
+    caloriesDisplay.textContent = `${caloriesBurned.toFixed(2)} kcal`; // Update calories display element
 });
 
 // Function to load and display saved health data
@@ -105,7 +104,7 @@ const saveHealthData = async () => {
 
         // Get new values from input fields
         let newSteps = parseInt(stepsInput.value) || 0;
-        let newCalories = parseInt(caloriesInput.value) || 0;
+        let newCalories = calculateCaloriesFromSteps(newSteps);
         let newWater = parseFloat(waterInput.value) || 0;
 
         // Add new values to the existing totals
@@ -150,5 +149,3 @@ onAuthStateChanged(auth, (user) => {
 
 // Attach event listener to save button
 saveButton.addEventListener("click", saveHealthData);
-
-
