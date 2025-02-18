@@ -9,24 +9,19 @@
 </head>
 <body>
     <div class="layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>Health Tracker</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="#" class="nav-link active" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a></li>
-                    <li><a href="#" class="nav-link" id="profileNav"><i class="fas fa-user"></i> Profile</a></li>
-                </ul>
-            </nav>
-        </aside>
-
         <!-- Main Content -->
         <main class="main-content">
             <header class="main-header">
                 <h1>Welcome Back!</h1>
                 <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
+                <!-- Dropdown Menu -->
+                <div class="dropdown">
+                    <button class="dropbtn">Menu <i class="fas fa-caret-down"></i></button>
+                    <div class="dropdown-content">
+                        <a href="#" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
+                        <a href="#" id="profileNav"><i class="fas fa-user"></i> Profile</a>
+                    </div>
+                </div>
             </header>
 
             <!-- Track Your Health Section -->
