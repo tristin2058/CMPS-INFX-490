@@ -56,13 +56,6 @@ const calculateCaloriesFromSteps = (steps) => {
     return steps * caloriesPerStep;
 };
 
-// Event listener to update calories burned when steps input changes
-stepsInput.addEventListener("input", () => {
-    const steps = parseInt(stepsInput.value) || 0;
-    const caloriesBurned = calculateCaloriesFromSteps(steps);
-    caloriesDisplay.textContent = `${caloriesBurned.toFixed(2)} kcal`; // Update calories display element
-});
-
 // Function to load and display saved health data
 const loadHealthData = async () => {
     const user = auth.currentUser;
