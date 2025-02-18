@@ -93,7 +93,7 @@ body {
     border-radius: 15px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 800px;
+    max-width: 500px;
     margin: 0 auto;
 }
 
@@ -105,8 +105,8 @@ body {
 
 .health-inputs {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px;
     justify-content: center; /* Center the inputs horizontally */
     margin-bottom: 20px;
 }
@@ -120,6 +120,7 @@ body {
 }
 
 .input-box label {
+    width: 60%;
     display: block;
     font-size: 14px;
     color: white;
@@ -130,7 +131,7 @@ body {
 }
 
 .input-box input {
-    width: 100%;
+    width: 90%;
     padding: 10px;
     font-size: 14px;
     border: 1px solid #ccc;

@@ -13,8 +13,10 @@ import {
 
 // Select input fields and buttons
 const stepsInput = document.getElementById("steps");
-const waterInput = document.getElementById("waterIntake");
+const waterAmountInput = document.getElementById("waterAmount");
+const waterUnitSelect = document.getElementById("waterUnit");
 const saveButton = document.querySelector(".btn-save");
+const undoButton = document.querySelector(".btn-undo");
 
 // Display elements
 const stepsDisplay = document.getElementById("stepsDisplay");
@@ -27,6 +29,9 @@ const profileModal = document.getElementById("profileModal");
 const closeProfile = document.getElementById("closeProfile");
 const logoutButton = document.getElementById("logoutButton");
 const userEmailDisplay = document.getElementById("userEmail");
+
+// Previous state for undo functionality
+let previousState = {};
 
 // Show Profile Modal
 profileNav.addEventListener("click", () => {
@@ -56,6 +61,19 @@ const calculateCaloriesFromSteps = (steps) => {
     return steps * caloriesPerStep;
 };
 
+// Function to convert water intake to liters
+const convertWaterToLiters = (amount, unit) => {
+    switch (unit) {
+        case "cups":
+            return amount * 0.24; // 1 cup = 0.24 liters
+        case "gallons":
+            return amount * 3.785; // 1 gallon = 3.785 liters
+        case "liters":
+        default:
+            return amount;
+    }
+};
+
 // Function to load and display saved health data
 const loadHealthData = async () => {
     const user = auth.currentUser;
@@ -71,6 +89,9 @@ const loadHealthData = async () => {
         stepsDisplay.textContent = `🚶 ${data.steps || 0}`;
         caloriesDisplay.textContent = `🔥 ${data.caloriesBurned || 0} kcal`;
         waterDisplay.textContent = `💧 ${data.waterIntake || 0}L`;
+
+        // Save the current state for undo functionality
+        previousState = { ...data };
     }
 };
 
@@ -97,13 +118,25 @@ const saveHealthData = async () => {
 
         // Get new values from input fields
         let newSteps = parseInt(stepsInput.value) || 0;
+        let newWaterAmount = parseFloat(waterAmountInput.value) || 0;
+
+        // Validate inputs to ensure no negative values
+        if (newSteps < 0 || newWaterAmount < 0) {
+            alert("Steps and water intake cannot be negative.");
+            return;
+        }
+
         let newCalories = calculateCaloriesFromSteps(newSteps);
-        let newWater = parseFloat(waterInput.value) || 0;
+        let newWaterUnit = waterUnitSelect.value;
+        let newWater = convertWaterToLiters(newWaterAmount, newWaterUnit);
 
         // Add new values to the existing totals
         let updatedSteps = previousSteps + newSteps;
         let updatedCalories = previousCalories + newCalories;
         let updatedWater = previousWater + newWater;
+
+        // Save the current state for undo functionality
+        previousState = { steps: previousSteps, caloriesBurned: previousCalories, waterIntake: previousWater };
 
         // Update Firestore with new cumulative data
         await setDoc(userDocRef, {
@@ -118,15 +151,50 @@ const saveHealthData = async () => {
         // Update the displayed values
         stepsDisplay.textContent = `🚶 ${updatedSteps}`;
         caloriesDisplay.textContent = `🔥 ${updatedCalories.toFixed(2)} kcal`;
-        waterDisplay.textContent = `💧 ${updatedWater}L`;
+        waterDisplay.textContent = `💧 ${updatedWater.toFixed(2)}L`;
+
+        // Show the undo button
+        undoButton.style.display = "inline-block";
 
         // Clear input fields after saving
         stepsInput.value = "";
-        waterInput.value = "";
+        waterAmountInput.value = "";
+        waterUnitSelect.value = "liters";
 
     } catch (error) {
         console.error("Error saving data: ", error);
         alert("Failed to save data.");
+    }
+};
+
+// Function to undo the last entry
+const undoLastEntry = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("User not authenticated. Please log in.");
+        return;
+    }
+
+    const userId = user.uid;
+    const userDocRef = doc(db, "users", userId);
+
+    try {
+        // Restore the previous state
+        await setDoc(userDocRef, previousState, { merge: true });
+
+        alert("Last entry undone successfully!");
+
+        // Update the displayed values
+        stepsDisplay.textContent = `🚶 ${previousState.steps || 0}`;
+        caloriesDisplay.textContent = `🔥 ${previousState.caloriesBurned.toFixed(2) || 0} kcal`;
+        waterDisplay.textContent = `💧 ${previousState.waterIntake.toFixed(2) || 0}L`;
+
+        // Hide the undo button
+        undoButton.style.display = "none";
+
+    } catch (error) {
+        console.error("Error undoing last entry: ", error);
+        alert("Failed to undo last entry.");
     }
 };
 
@@ -140,5 +208,6 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Attach event listener to save button
+// Attach event listeners to buttons
 saveButton.addEventListener("click", saveHealthData);
+undoButton.addEventListener("click", undoLastEntry);
