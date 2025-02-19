@@ -12,7 +12,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="main-header">
-                <h1>Exercise Logging</h1>
+                <h1>Exercise Log</h1>
                 <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
                 <!-- Dropdown Menu -->
                 <div class="dropdown">
@@ -33,8 +33,8 @@
                         <div class="input-box">
                             <label for="exerciseType">Exercise Type:</label>
                             <select id="exerciseType" required>
-                                <option value="cardio">Cardio</option>
-                                <option value="workouts">Workouts</option>
+                                <option value="Cardio">Cardio</option>
+                                <option value="Workouts">Workouts</option>
                             </select>
                         </div>
                         <div id="dynamicInputs">
@@ -49,15 +49,37 @@
             <!-- Exercise Overview Section -->
             <section class="overview">
                 <h2>Exercise Overview</h2>
+                <h3>Today's Most Recent Exercise</h3> <!-- Added text -->
+                
                 <div class="metrics">
+                    <!-- Cardio Section -->
                     <div class="metric-card">
-                        <h3>Exercise</h3>
-                        <p id="exerciseDisplay">🏋️ None</p>
+                        <h3>Cardio Type</h3> <!-- Added heading for cardio type -->
+                        <p id="cardioTypeDisplay">None</p> <!-- Added element to display cardio type -->
                     </div>
                     <div class="metric-card">
-                        <h3>Duration</h3>
-                        <p id="durationDisplay">⏱️ 0 mins</p>
+                        <h3>Distance</h3>
+                        <p id="cardioDistanceDisplay">0 km</p>
                     </div>
+                    
+                    <!-- Workouts Section -->
+                    <div class="metric-card">
+                        <h3>Workout Type</h3> <!-- Added heading for workout type -->
+                        <p id="workoutTypeDisplay">None</p> <!-- Added element to display workout type -->
+                    </div>
+                    <div class="metric-card">
+                        <h3>Reps</h3>
+                        <p id="workoutRepsDisplay">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Sets</h3>
+                        <p id="workoutSetsDisplay">0</p>
+                    </div>
+                </div>
+                <h3>History</h3> <!-- Added text for history section -->
+                <!-- Exercise List -->
+                <div id="exerciseList">
+                    <!-- List of exercises will be displayed here -->
                 </div>
             </section>
         </main>
