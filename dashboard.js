@@ -8,7 +8,10 @@ import {
     doc,
     getDoc,
     setDoc,
-    updateDoc
+    updateDoc,
+    query,
+    where,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Select input fields and buttons
@@ -22,6 +25,7 @@ const undoButton = document.querySelector(".btn-undo");
 const stepsDisplay = document.getElementById("stepsDisplay");
 const caloriesDisplay = document.getElementById("caloriesBurnedDisplay");
 const waterDisplay = document.getElementById("waterIntakeDisplay");
+const historyList = document.getElementById("historyList");
 
 // Profile and logout elements
 const profileNav = document.getElementById("profileNav");
@@ -79,20 +83,66 @@ const loadHealthData = async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    const userDocRef = doc(db, "users", user.uid);
+    const userDocRef = doc(db, "users", user.uid); // Use UID as document ID
     const userSnap = await getDoc(userDocRef);
 
     if (userSnap.exists()) {
         const data = userSnap.data();
         
-        // Display the stored values (use default 0 if missing)
-        stepsDisplay.textContent = `🚶 ${data.steps || 0}`;
-        caloriesDisplay.textContent = `🔥 ${data.caloriesBurned || 0} kcal`;
-        waterDisplay.textContent = `💧 ${data.waterIntake || 0}L`;
+        // Check if the data is from today
+        const lastUpdateDate = new Date(data.date);
+        const today = new Date();
+        if (lastUpdateDate.toDateString() !== today.toDateString()) {
+            // If the data is not from today, reset the values
+            await setDoc(userDocRef, {
+                steps: 0,
+                caloriesBurned: 0,
+                waterIntake: 0,
+                date: today.toISOString()
+            }, { merge: true });
+
+            stepsDisplay.textContent = `🚶 0`;
+            caloriesDisplay.textContent = `🔥 0 kcal`;
+            waterDisplay.textContent = `💧 0L`;
+        } else {
+            // Display the stored values (use default 0 if missing)
+            stepsDisplay.textContent = `🚶 ${data.steps || 0}`;
+            caloriesDisplay.textContent = `🔥 ${data.caloriesBurned || 0} kcal`;
+            waterDisplay.textContent = `💧 ${data.waterIntake || 0}L`;
+        }
 
         // Save the current state for undo functionality
         previousState = { ...data };
     }
+
+    // Load and display historical data
+    loadHistoricalData(user.uid);
+};
+
+// Function to load and display historical data
+const loadHistoricalData = async (uid) => {
+    const historyQuery = query(collection(db, `users/${uid}/history`));
+    const querySnapshot = await getDocs(historyQuery);
+
+    historyList.innerHTML = ""; // Clear existing history
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const date = new Date(data.date).toDateString();
+
+        // Skip today's data
+        if (date === new Date().toDateString()) return;
+
+        const historyItem = document.createElement("div");
+        historyItem.classList.add("history-item");
+        historyItem.innerHTML = `
+            <h3>${date}</h3>
+            <p>Steps: 🚶 ${data.steps || 0}</p>
+            <p>Calories Burned: 🔥 ${data.caloriesBurned || 0} kcal</p>
+            <p>Water Intake: 💧 ${data.waterIntake || 0}L</p>
+        `;
+        historyList.appendChild(historyItem);
+    });
 };
 
 // Function to save and update cumulative health data
@@ -103,8 +153,7 @@ const saveHealthData = async () => {
         return;
     }
 
-    const userId = user.uid;
-    const userDocRef = doc(db, "users", userId);
+    const userDocRef = doc(db, "users", user.uid); // Use UID as document ID
 
     try {
         // Retrieve current data first
@@ -146,6 +195,15 @@ const saveHealthData = async () => {
             date: new Date().toISOString()
         }, { merge: true });
 
+        // Save historical data
+        const historyDocRef = doc(collection(db, `users/${user.uid}/history`), new Date().toISOString());
+        await setDoc(historyDocRef, {
+            steps: updatedSteps,
+            caloriesBurned: updatedCalories,
+            waterIntake: updatedWater,
+            date: new Date().toISOString()
+        });
+
         alert("Data updated successfully!");
 
         // Update the displayed values
@@ -175,14 +233,11 @@ const undoLastEntry = async () => {
         return;
     }
 
-    const userId = user.uid;
-    const userDocRef = doc(db, "users", userId);
+    const userDocRef = doc(db, "users", user.uid); // Use UID as document ID
 
     try {
         // Restore the previous state
         await setDoc(userDocRef, previousState, { merge: true });
-
-        alert("Last entry undone successfully!");
 
         // Update the displayed values
         stepsDisplay.textContent = `🚶 ${previousState.steps || 0}`;
