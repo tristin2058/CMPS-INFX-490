@@ -9,28 +9,70 @@
 </head>
 <body>
     <div class="layout">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html">Profile</a>
+            <a href="exercise-logging.html">Logging</a>
+            <a href="#" id="logoutButton">Sign Out</a>
+        </nav>
+
         <!-- Main Content -->
         <main class="main-content">
-            <header class="main-header">
-                <h1>Profile</h1>
-                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
-                <!-- Dropdown Menu -->
-                <div class="dropdown">
-                    <button class="dropbtn">Menu <i class="fas fa-caret-down"></i></button>
-                    <div class="dropdown-content">
-                        <a href="dashboard.html" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
-                        <a href="exercise-logging.html" id="exerciseLoggingNav"><i class="fas fa-dumbbell"></i> Exercise Logging</a>
-                        <a href="profile.html" id="profileNav"><i class="fas fa-user"></i> Profile</a>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Profile Section -->
             <section class="profile-section">
                 <div class="profile-card">
-                    <h2>Your Profile</h2>
-                    <p id="userEmail">Loading...</p>
-                    <button id="logoutButton" class="btn-danger">Logout</button>
+                    <div class="profile-header">
+                        <img src="profile-placeholder.png" alt="Profile Picture" class="profile-picture">
+                        <h2 id="displayName">Display Name</h2>
+                        <p id="username">@name</p>
+                    </div>
+                    <div class="profile-bio">
+                        <h3>Bio</h3>
+                        <p id="bio">Bio section</p>
+                        <textarea id="editBio" class="edit-input" style="display: none;"></textarea>
+                    </div>
+                    <div class="profile-stats">
+                        <h3>Stats</h3>
+                        <div class="stat-item">
+                            <p id="age">Age: </p>
+                            <input type="number" id="editAge" class="edit-input" style="display: none;">
+                        </div>
+                        <div class="stat-item">
+                            <p id="height">Height: </p>
+                            <input type="text" id="editHeight" class="edit-input" style="display: none;">
+                        </div>
+                        <div class="stat-item">
+                            <p id="weight">Weight: </p>
+                            <input type="number" id="editWeight" class="edit-input" style="display: none;">
+                        </div>
+                        <div class="stat-item">
+                            <p id="gender">Gender: </p>
+                            <input type="text" id="editGender" class="edit-input" style="display: none;">
+                        </div>
+                        <div class="stat-item">
+                            <p id="bmi">BMI: </p>
+                            <input type="number" id="editBmi" class="edit-input" style="display: none;">
+                        </div>
+                    </div>
+                    <button id="editProfileButton" class="btn-edit">Edit Profile</button>
+                    <button id="saveProfileButton" class="btn-save" style="display: none;">Save Changes</button>
+                    <button id="cancelEditButton" class="btn-secondary" style="display: none;">Cancel</button>
+                </div>
+                <div class="goals-card">
+                    <h3>Current Exercise Goals</h3>
+                    <p id="goals">User can put things that they’re trying to achieve like losing a certain amount of weight</p>
+                </div>
+                <div class="milestones-card">
+                    <h3>Recently Reached Milestones</h3>
+                    <p id="milestones">User can pin previous goals that they met recently</p>
+                </div>
+                <div class="log-history-card">
+                    <h3>Recent Log History</h3>
+                    <div id="logHistory">Recent log history</div>
+                </div>
+                <div class="charts-card">
+                    <h3>Graphs and Charts</h3>
+                    <div id="charts">Some sort of graphs and charts based on recent logging history</div>
                 </div>
             </section>
         </main>

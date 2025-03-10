@@ -5,6 +5,23 @@ body {
     background-color: #f4f4f4;
 }
 
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    background-color: #333;
+    padding: 10px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+}
+
+.navbar a:hover {
+    background-color: #575757;
+}
+
 .layout {
     display: flex;
     flex-direction: column;
@@ -15,81 +32,88 @@ body {
 
 .main-content {
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     background-color: #fff;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.profile-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropbtn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
 }
 
 .profile-section {
-    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
 }
 
-.profile-card {
+.profile-card, .goals-card, .milestones-card, .log-history-card, .charts-card {
     background-color: #fff;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.btn-danger {
-    background-color: #d9534f;
-    color: white;
-    border: none;
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.profile-bio, .profile-stats {
+    margin-top: 20px;
+}
+
+.profile-stats p {
+    margin: 5px 0;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.edit-input {
+    width: 100px;
+    margin: 5px 0;
+    padding: 5px;
+}
+
+.btn-edit, .btn-save, .btn-secondary {
+    margin-top: 20px;
     padding: 10px 20px;
+    border: none;
     cursor: pointer;
 }
 
-.btn-danger:hover {
-    background-color: #c9302c;
+.btn-edit {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #45a049;
+}
+
+.btn-save {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #45a049;
+}
+
+.btn-secondary {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #da190b;
 }
