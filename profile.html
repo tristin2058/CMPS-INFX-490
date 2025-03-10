@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="profile.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="layout">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Profile</h1>
+                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
+                <!-- Dropdown Menu -->
+                <div class="dropdown">
+                    <button class="dropbtn">Menu <i class="fas fa-caret-down"></i></button>
+                    <div class="dropdown-content">
+                        <a href="dashboard.html" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
+                        <a href="exercise-logging.html" id="exerciseLoggingNav"><i class="fas fa-dumbbell"></i> Exercise Logging</a>
+                        <a href="profile.html" id="profileNav"><i class="fas fa-user"></i> Profile</a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Profile Section -->
+            <section class="profile-section">
+                <div class="profile-card">
+                    <h2>Your Profile</h2>
+                    <p id="userEmail">Loading...</p>
+                    <button id="logoutButton" class="btn-danger">Logout</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="profile.js"></script>
+</body>
+</html>
