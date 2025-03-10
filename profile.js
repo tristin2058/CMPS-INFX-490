@@ -31,7 +31,7 @@ const editBmi = document.getElementById("editBmi");
 // Monitor authentication state
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = doc(db, "profile", user.uid); // Update to use 'profile' collection
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
@@ -97,7 +97,7 @@ saveProfileButton.addEventListener("click", async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
     if (user) {
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = doc(db, "profile", user.uid); // Update to use 'profile' collection
         const updatedData = {
             bio: editBio.value,
             age: parseInt(editAge.value, 10),
