@@ -9,28 +9,28 @@
 </head>
 <body>
     <div class="layout">
-        <header class="main-header">
-            <h1>Profile</h1>
-            <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
-            <!-- Dropdown Menu -->
-            <div class="dropdown">
-                <button class="dropbtn">Menu <i class="fas fa-caret-down"></i></button>
-                <div class="dropdown-content">
-                    <a href="exercise-logging.html" id="exerciseLoggingNav"><i class="fas fa-dumbbell"></i> Exercise Logging</a>
-                    <a href="dashboard.html" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
+        <main class = "main-content">
+            <header class="main-header">
+                <h1>Profile</h1>
+                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
+                    <div class="dropdown">
+                        <button class="dropbtn">Menu</button> <i class="fas fa-caret-down"></i></button>
+                        <div class="dropdown-content">
+                            <a href="exercise-logging.html" id="exerciseLoggingNav"><i class="fas fa-dumbbell"></i> Exercise Logging</a>
+                            <a href="dashboard.html" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
 
-
-        <!-- Main Content -->
-        <main class="main-content">
             <section class="profile-section">
                 <div class="profile-card">
                     <div class="profile-header">
                         <img src="profile-placeholder.png" alt="Profile Picture" class="profile-picture">
-                        <h2 id="displayName">Display Name</h2>
-                        <p id="username">@name</p>
+                        <div>
+                            <h2 id="displayName">Display Name</h2>
+                            <p id="username">@name</p>
+                        </div>
                     </div>
                     <div class="profile-bio">
                         <h3>Bio</h3>
