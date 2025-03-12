@@ -13,54 +13,47 @@ body {
     width: 100%;
 }
 
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background: #007BFF;
+/* Dropdown Menu */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #4CAF50;
     color: white;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
     padding: 20px;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
 }
 
-.sidebar-header {
-    text-align: center;
-    margin-bottom: 20px;
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
 }
 
-.sidebar h2 {
-    font-size: 24px;
-}
-
-.sidebar-nav ul {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar-nav ul li {
-    margin: 10px 0;
-}
-
-.nav-link {
-    color: white;
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
     text-decoration: none;
-    font-size: 18px;
-    padding: 10px;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: block;
 }
 
-.nav-link.active {
-    background: white;
-    color: #007BFF;
-    font-weight: bold;
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
 }
 
-.nav-link:hover {
-    background: rgba(255, 255, 255, 0.2);
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #3e8e41;
 }
 
 /* Main Content */
@@ -100,7 +93,7 @@ body {
     border-radius: 15px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 800px;
+    max-width: 500px;
     margin: 0 auto;
 }
 
@@ -112,8 +105,8 @@ body {
 
 .health-inputs {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px;
     justify-content: center; /* Center the inputs horizontally */
     margin-bottom: 20px;
 }
@@ -127,6 +120,7 @@ body {
 }
 
 .input-box label {
+    width: 60%;
     display: block;
     font-size: 14px;
     color: white;
@@ -137,7 +131,7 @@ body {
 }
 
 .input-box input {
-    width: 100%;
+    width: 90%;
     padding: 10px;
     font-size: 14px;
     border: 1px solid #ccc;

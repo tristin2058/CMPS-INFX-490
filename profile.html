@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="profile.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="layout">
+        <main class = "main-content">
+            <header class="main-header">
+                <h1>Profile</h1>
+                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
+                    <div class="dropdown">
+                        <button class="dropbtn">Menu</button> <i class="fas fa-caret-down"></i></button>
+                        <div class="dropdown-content">
+                            <a href="exercise-logging.html" id="exerciseLoggingNav"><i class="fas fa-dumbbell"></i> Exercise Logging</a>
+                            <a href="dashboard.html" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <img src="profile-placeholder.png" alt="Profile Picture" class="profile-picture">
+                        <div>
+                            <h2 id="displayName">Display Name</h2>
+                            <p id="username">@name</p>
+                        </div>
+                    </div>
+                    <div class="profile-bio">
+                        <h3>Bio</h3>
+                        <p id="bio">Bio section</p>
+                        <textarea id="editBio" class="edit-input" style="display: none;"></textarea>
+                    </div>
+                    <div class="profile-stats">
+                        <h3>Stats</h3>
+                        <div class="stat-item">
+                            <p id="age">Age: </p>
+                            <input type="number" id="editAge" class="edit-input" style="display: none;">
+                        </div>
+                        <div class="stat-item">
+                            <p id="height">Height: </p>
+                            <input type="text" id="editHeight" class="edit-input" style="display: none;">
+                            <select id="heightUnit" class="edit-input" style="display: none;">
+                                <option value="cm">cm</option>
+                                <option value="m">m</option>
+                                <option value="in">in</option>
+                                <option value="ft">ft</option>
+                            </select>
+                        </div>
+                        <div class="stat-item">
+                            <p id="weight">Weight: </p>
+                            <input type="number" id="editWeight" class="edit-input" style="display: none;">
+                            <select id="weightUnit" class="edit-input" style="display: none;">
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                            </select>
+                        </div>
+                        <div class="stat-item">
+                            <p id="gender">Gender: </p>
+                            <input type="text" id="editGender" class="edit-input" style="display: none;">
+                        </div>
+                        <div class="stat-item">
+                            <p id="bmi">BMI: </p>
+                        </div>
+                    </div>
+                    <button id="editProfileButton" class="btn-edit">Edit Profile</button>
+                    <button id="saveProfileButton" class="btn-save" style="display: none;">Save Changes</button>
+                    <button id="cancelEditButton" class="btn-secondary" style="display: none;">Cancel</button>
+                </div>
+                <div class="goals-card">
+                    <h3>Current Exercise Goals</h3>
+                    <p id="goals">User can put things that they’re trying to achieve like losing a certain amount of weight</p>
+                </div>
+                <div class="milestones-card">
+                    <h3>Recently Reached Milestones</h3>
+                    <p id="milestones">User can pin previous goals that they met recently</p>
+                </div>
+                <div class="log-history-card">
+                    <h3>Recent Log History</h3>
+                    <div id="logHistory">Recent log history</div>
+                </div>
+                <div class="charts-card">
+                    <h3>Graphs and Charts</h3>
+                    <div id="charts">Some sort of graphs and charts based on recent logging history</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="profile.js"></script>
+</body>
+</html>
