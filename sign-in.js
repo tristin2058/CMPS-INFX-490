@@ -23,12 +23,16 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ✅ Toggle between Login & Signup forms
-document.getElementById("showLogin")?.addEventListener("click", () => {
+document.getElementById("showLogin")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("registerForm").reset(); // Clear register form inputs
     document.getElementById("registerSection").style.display = "none";
     document.getElementById("loginSection").style.display = "block";
 });
 
-document.getElementById("showRegister")?.addEventListener("click", () => {
+document.getElementById("showRegister")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("loginForm").reset(); // Clear login form inputs
     document.getElementById("loginSection").style.display = "none";
     document.getElementById("registerSection").style.display = "block";
 });

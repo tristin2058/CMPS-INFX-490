@@ -2,12 +2,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ✅ Ensure the correct Firebase credentials are used
 const firebaseConfig = {
   apiKey: "AIzaSyDA54ZzIYxmSBLmnTXsFtFJAi4CHmxVTDU",
   authDomain: "authentication-6de40.firebaseapp.com",
   projectId: "authentication-6de40",
-  storageBucket: "authentication-6de40.appspot.com", // ✅ Fixed here
+  storageBucket: "authentication-6de40.appspot.com",
   messagingSenderId: "964307532417",
   appId: "1:964307532417:web:1d5a265837649451c6ab80",
   measurementId: "G-229EJRNSZE"
