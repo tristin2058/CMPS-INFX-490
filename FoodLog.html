@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Log</title>
+    <link rel="stylesheet" href="FoodLog.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>Food Log Tracker</header>
+
+    <div class="container">
+        <!-- Calendar Section -->
+        <div class="history-tracker">
+            <h2>Calendar</h2>
+            <div class="calendar"></div>
+        </div>
+
+        <!-- Meal Entries Section -->
+        <div class="meal-entries">
+            <h2>Meal Entries</h2>
+            <textarea placeholder="Breakfast ex: eggs - 100"></textarea>
+            <textarea placeholder="Lunch ex: burger - 300"></textarea>
+            <textarea placeholder="Dinner ex steak - 450"></textarea>
+            <button id="submit-meals-button">Submit Meals</button> <!-- Added ID for JavaScript -->
+        </div>
+
+        <!-- Daily Summary Section -->
+        <div class="daily-summary">
+            <h2>Daily Summary</h2>
+            <p>Calories Consumed: <span id="calories-consumed">0</span></p>
+            <p>Calories Burned: <span id="calories-burned">0</span></p>
+        </div>
+
+        <!-- AI Help Bot Section -->
+        <div class="ai-help-bot">
+            <h2>AI Health Bot</h2>
+            <p>Need tips or guidance? Ask the bot!</p>
+            <button>Chat with Bot</button>
+        </div>
+
+        <!-- Meal History Section -->
+        <div class="history-log">
+            <h2>Meal History</h2>
+            <p>No entries yet.</p>
+        </div>
+    </div>
+
+    <script src="FoodLog.js"></script> <!-- This connects to your FoodLog.js file -->
+</body>
+</html>
+
