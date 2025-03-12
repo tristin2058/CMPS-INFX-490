@@ -9,13 +9,19 @@
 </head>
 <body>
     <div class="layout">
-        <!-- Navigation Bar -->
-        <nav class="navbar">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="profile.html">Profile</a>
-            <a href="exercise-logging.html">Logging</a>
-            <a href="#" id="logoutButton">Sign Out</a>
-        </nav>
+        <header class="main-header">
+            <h1>Profile</h1>
+            <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
+            <!-- Dropdown Menu -->
+            <div class="dropdown">
+                <button class="dropbtn">Menu <i class="fas fa-caret-down"></i></button>
+                <div class="dropdown-content">
+                    <a href="exercise-logging.html" id="exerciseLoggingNav"><i class="fas fa-dumbbell"></i> Exercise Logging</a>
+                    <a href="dashboard.html" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a>
+                </div>
+            </div>
+        </header>
+
 
         <!-- Main Content -->
         <main class="main-content">
@@ -40,10 +46,20 @@
                         <div class="stat-item">
                             <p id="height">Height: </p>
                             <input type="text" id="editHeight" class="edit-input" style="display: none;">
+                            <select id="heightUnit" class="edit-input" style="display: none;">
+                                <option value="cm">cm</option>
+                                <option value="m">m</option>
+                                <option value="in">in</option>
+                                <option value="ft">ft</option>
+                            </select>
                         </div>
                         <div class="stat-item">
                             <p id="weight">Weight: </p>
                             <input type="number" id="editWeight" class="edit-input" style="display: none;">
+                            <select id="weightUnit" class="edit-input" style="display: none;">
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                            </select>
                         </div>
                         <div class="stat-item">
                             <p id="gender">Gender: </p>
@@ -51,7 +67,6 @@
                         </div>
                         <div class="stat-item">
                             <p id="bmi">BMI: </p>
-                            <input type="number" id="editBmi" class="edit-input" style="display: none;">
                         </div>
                     </div>
                     <button id="editProfileButton" class="btn-edit">Edit Profile</button>

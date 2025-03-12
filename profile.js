@@ -26,7 +26,19 @@ const editAge = document.getElementById("editAge");
 const editHeight = document.getElementById("editHeight");
 const editWeight = document.getElementById("editWeight");
 const editGender = document.getElementById("editGender");
-const editBmi = document.getElementById("editBmi");
+const heightUnit = document.getElementById("heightUnit");
+const weightUnit = document.getElementById("weightUnit");
+
+// Clear input fields on page load
+window.addEventListener('load', () => {
+    editBio.value = "";
+    editAge.value = "";
+    editHeight.value = "";
+    editWeight.value = "";
+    editGender.value = "";
+    heightUnit.value = "cm"; // Default to cm
+    weightUnit.value = "kg"; // Default to kg
+});
 
 // Monitor authentication state
 onAuthStateChanged(auth, async (user) => {
@@ -52,10 +64,11 @@ onAuthStateChanged(auth, async (user) => {
             // Populate edit form with current data
             editBio.value = userData.bio || "";
             editAge.value = userData.age || "";
-            editHeight.value = userData.height || "";
-            editWeight.value = userData.weight || "";
+            editHeight.value = userData.height ? userData.height.split(" ")[0] : "";
+            heightUnit.value = userData.height ? userData.height.split(" ")[1] : "cm";
+            editWeight.value = userData.weight ? userData.weight.split(" ")[0] : "";
+            weightUnit.value = userData.weight ? userData.weight.split(" ")[1] : "kg";
             editGender.value = userData.gender || "";
-            editBmi.value = userData.bmi || "";
         } else {
             console.log("No such document!");
         }
@@ -68,11 +81,16 @@ onAuthStateChanged(auth, async (user) => {
 editProfileButton.addEventListener("click", () => {
     bio.style.display = "none";
     editBio.style.display = "block";
+    age.textContent = "Age: ";
     editAge.style.display = "block";
+    height.textContent = "Height: ";
     editHeight.style.display = "block";
+    heightUnit.style.display = "block";
+    weight.textContent = "Weight: ";
     editWeight.style.display = "block";
+    weightUnit.style.display = "block";
+    gender.textContent = "Gender: ";
     editGender.style.display = "block";
-    editBmi.style.display = "block";
     editProfileButton.style.display = "none";
     saveProfileButton.style.display = "inline-block";
     cancelEditButton.style.display = "inline-block";
@@ -82,11 +100,16 @@ editProfileButton.addEventListener("click", () => {
 cancelEditButton.addEventListener("click", () => {
     bio.style.display = "block";
     editBio.style.display = "none";
+    age.style.display = "block";
     editAge.style.display = "none";
+    height.style.display = "block";
     editHeight.style.display = "none";
+    heightUnit.style.display = "none";
+    weight.style.display = "block";
     editWeight.style.display = "none";
+    weightUnit.style.display = "none";
+    gender.style.display = "block";
     editGender.style.display = "none";
-    editBmi.style.display = "none";
     editProfileButton.style.display = "inline-block";
     saveProfileButton.style.display = "none";
     cancelEditButton.style.display = "none";
@@ -95,16 +118,48 @@ cancelEditButton.addEventListener("click", () => {
 // Save Profile Changes
 saveProfileButton.addEventListener("click", async (e) => {
     e.preventDefault();
+    console.log("Save button clicked"); // Debugging line
     const user = auth.currentUser;
     if (user) {
         const userDocRef = doc(db, "profile", user.uid); // Update to use 'profile' collection
+        let heightValue = parseFloat(editHeight.value);
+        let heightDisplay = "";
+        let weightValue = parseFloat(editWeight.value);
+        let weightDisplay = "";
+
+        // Convert height to meters or feet if necessary
+        if (heightUnit.value === "in" || heightUnit.value === "ft") {
+            const totalInches = heightUnit.value === "in" ? heightValue : heightValue * 12;
+            const feet = Math.floor(totalInches / 12);
+            const inches = totalInches % 12;
+            heightDisplay = `${feet} ft ${inches.toFixed(2)} in`;
+            heightValue = totalInches * 0.0254; // Convert inches to meters
+        } else {
+            const totalCm = heightUnit.value === "cm" ? heightValue : heightValue * 100;
+            const meters = Math.floor(totalCm / 100);
+            const cm = totalCm % 100;
+            heightDisplay = `${meters} m ${cm.toFixed(2)} cm`;
+            heightValue = totalCm / 100; // Convert cm to meters
+        }
+
+        // Convert weight to kilograms or pounds if necessary
+        if (weightUnit.value === "lb") {
+            weightDisplay = `${weightValue.toFixed(2)} lb`;
+            weightValue = weightValue * 0.453592; // Convert pounds to kg
+        } else {
+            weightDisplay = `${weightValue.toFixed(2)} kg`;
+        }
+
+        // Calculate BMI
+        const bmiValue = weightValue / (heightValue * heightValue);
+
         const updatedData = {
             bio: editBio.value,
             age: parseInt(editAge.value, 10),
-            height: editHeight.value,
-            weight: parseInt(editWeight.value, 10),
+            height: heightDisplay,
+            weight: weightDisplay,
             gender: editGender.value,
-            bmi: parseInt(editBmi.value, 10),
+            bmi: bmiValue.toFixed(2),
         };
 
         console.log("Updated Data:", updatedData); // Debugging line
@@ -114,17 +169,22 @@ saveProfileButton.addEventListener("click", async (e) => {
             alert("Profile updated successfully!");
             bio.textContent = updatedData.bio;
             age.textContent = `Age: ${updatedData.age}`;
-            height.textContent = `Height: ${updatedData.height}`;
-            weight.textContent = `Weight: ${updatedData.weight}`;
+            height.textContent = `Height: ${heightDisplay}`;
+            weight.textContent = `Weight: ${weightDisplay}`;
             gender.textContent = `Gender: ${updatedData.gender}`;
             bmi.textContent = `BMI: ${updatedData.bmi}`;
             bio.style.display = "block";
             editBio.style.display = "none";
+            age.style.display = "block";
             editAge.style.display = "none";
+            height.style.display = "block";
             editHeight.style.display = "none";
+            heightUnit.style.display = "none";
+            weight.style.display = "block";
             editWeight.style.display = "none";
+            weightUnit.style.display = "none";
+            gender.style.display = "block";
             editGender.style.display = "none";
-            editBmi.style.display = "none";
             editProfileButton.style.display = "inline-block";
             saveProfileButton.style.display = "none";
             cancelEditButton.style.display = "none";
@@ -134,6 +194,49 @@ saveProfileButton.addEventListener("click", async (e) => {
     } else {
         console.log("No user is currently signed in."); // Debugging line
     }
+});
+
+weightUnit.addEventListener("change", () => {
+    let weightValue = parseFloat(editWeight.value);
+    if (isNaN(weightValue)) return;
+
+    if (weightUnit.value === "kg") {
+        // Convert from pounds to kilograms
+        editWeight.value = (weightValue * 0.453592).toFixed(2);
+    } else {
+        // Convert from kilograms to pounds
+        editWeight.value = (weightValue / 0.453592).toFixed(2);
+    }
+});
+
+let previousHeightUnit = heightUnit.value; // Track previous unit
+
+heightUnit.addEventListener("change", () => {
+    let heightValue = parseFloat(editHeight.value);
+    if (isNaN(heightValue)) return;
+
+    let newUnit = heightUnit.value;
+
+    // Convert from previous unit to cm first (universal base)
+    if (previousHeightUnit === "in") {
+        heightValue *= 2.54; // Inches to cm
+    } else if (previousHeightUnit === "ft") {
+        heightValue *= 30.48; // Feet to cm
+    } else if (previousHeightUnit === "m") {
+        heightValue *= 100; // Meters to cm
+    }
+
+    // Convert from cm to the new unit
+    if (newUnit === "in") {
+        heightValue /= 2.54; // cm to inches
+    } else if (newUnit === "ft") {
+        heightValue /= 30.48; // cm to feet
+    } else if (newUnit === "m") {
+        heightValue /= 100; // cm to meters
+    }
+
+    editHeight.value = heightValue.toFixed(2);
+    previousHeightUnit = newUnit; // Update previous unit for next change
 });
 
 // Logout Functionality
