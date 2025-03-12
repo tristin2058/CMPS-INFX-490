@@ -6,8 +6,94 @@
     <title>Food Log</title>
     <link rel="stylesheet" href="FoodLog.css">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f3f4f6;
+        }
+        .taskbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2D3748;
+            padding: 15px 30px;
+            color: #E2E8F0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .nav-links {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            gap: 60px;
+        }
+        .nav-links a {
+            color: #E2E8F0;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #63B3ED;
+        }
+        .profile-dropdown {
+            position: relative;
+        }
+        .profile-button {
+            background-color: #63B3ED;
+            color: #2D3748;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #1A202C;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px 0;
+            z-index: 1;
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #E2E8F0;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .dropdown-menu a:hover {
+            background-color: #2D3748;
+        }
+        .profile-button:hover + .dropdown-menu,
+        .dropdown-menu:hover {
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <div class="taskbar">
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Food Log</a>
+            <a href="#">Exercise Log</a>
+            <a href="#">History</a>
+        </div>
+        <div class="profile-dropdown">
+            <button class="profile-button">Profile ▼</button>
+            <div class="dropdown-menu">
+                <a href="#">View Profile</a>
+                <a href="#">Settings</a>
+                <a href="#">Logout</a>
+            </div>
+        </div>
+    </div>
+    
     <header>Food Log Tracker</header>
 
     <div class="container">
@@ -23,7 +109,7 @@
             <textarea placeholder="Breakfast ex: eggs - 100"></textarea>
             <textarea placeholder="Lunch ex: burger - 300"></textarea>
             <textarea placeholder="Dinner ex steak - 450"></textarea>
-            <button id="submit-meals-button">Submit Meals</button> <!-- Added ID for JavaScript -->
+            <button id="submit-meals-button">Submit Meals</button>
         </div>
 
         <!-- Daily Summary Section -->
@@ -47,7 +133,7 @@
         </div>
     </div>
 
-    <script src="FoodLog.js"></script> <!-- This connects to your FoodLog.js file -->
+    <script src="FoodLog.js"></script>
 </body>
 </html>
 
