@@ -32,7 +32,7 @@ function createTaskbar() {
             }
             .profile-dropdown {
                 position: relative;
-                margin-right: 20px;
+                margin-right: 40px;
             }
             .profile-button {
                 background-color: #63B3ED;
