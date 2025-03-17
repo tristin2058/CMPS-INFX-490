@@ -73,10 +73,3 @@ document.addEventListener('DOMContentLoaded', () => {
         dailySummaryDisplay.textContent = `Today's Summary: ${totalCalories} kcal consumed.`;
     });
 });
-
-
-
-
-
-
-
