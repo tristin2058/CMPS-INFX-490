@@ -9,12 +9,17 @@ function createTaskbar() {
                 padding: 15px 30px;
                 color: #E2E8F0;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 1000;
             }
             .nav-links {
                 display: flex;
                 flex: 1;
                 justify-content: center;
-                gap: 60px;
+                gap: 40px;
             }
             .nav-links a {
                 color: #E2E8F0;
@@ -27,6 +32,7 @@ function createTaskbar() {
             }
             .profile-dropdown {
                 position: relative;
+                margin-right: 20px;
             }
             .profile-button {
                 background-color: #63B3ED;
@@ -60,6 +66,9 @@ function createTaskbar() {
             .profile-button:hover + .dropdown-menu,
             .dropdown-menu:hover {
                 display: block;
+            }
+            body {
+                padding-top: 70px; /* Ensures content is not hidden behind the taskbar */
             }
         </style>
         <div class="taskbar">
