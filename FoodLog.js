@@ -1,68 +1,82 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const mealEntryInputs = document.querySelectorAll('textarea');
-    const submitMealsButton = document.querySelector('#submit-meals-button'); // Ensure the correct button is selected
+    const submitMealsButton = document.querySelector('#submit-meals-button');
     const historyLog = document.querySelector('.history-log p');
     const calorieTotalDisplay = document.getElementById('calories-consumed');
-    const dailySummaryDisplay = document.getElementById('daily-summary'); // Display for daily summary
-    let totalCalories = 0;  // Initialize total calories to 0
+    const dailySummaryDisplay = document.getElementById('daily-summary');
+    const mealEntryInputs = document.querySelectorAll('.meal-input'); // Changed to match input class
+    let totalCalories = 0;
 
-    // Function to search USDA food data (mock example, replace with actual API if needed)
+    const USDA_API_KEY = 'TlJi5aBkuJ2ur7CEppmSTrKsCKCdNftjRWJhLrd5'; // API Key
+    const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
+
+    // Function to fetch data from the USDA API
     async function searchUSDAFood(query) {
-        console.log(`Searching for food: ${query}`);  // Log the food search query
-        // For now, mock the API response for food items.
-        // This is where you'd use the actual USDA API or mock data.
-        return [{
-            description: `${query} (mock data)`,
-            calories: 100  // Mocking 100 calories for any food entered
-        }];
+        try {
+            const response = await fetch(`${USDA_API_URL}?query=${query}&api_key=${USDA_API_KEY}`);
+            const data = await response.json();
+            console.log(`USDA API Response for '${query}':`, data);
+            return data.foods || [];
+        } catch (error) {
+            console.error('Error fetching food data:', error);
+            return [];
+        }
     }
 
-    // Event listener for Submit Meals Button
+    // Function to handle meal entry using manual calories
+    function handleManualEntry(foodName, calories) {
+        return `<strong>${foodName}</strong> - Manual entry - ${calories} kcal`;
+    }
+
+    // Function to handle API search and get calorie data
+    async function handleAPIEntry(foodName) {
+        const foodResults = await searchUSDAFood(foodName);
+        if (foodResults.length > 0) {
+            const selectedFood = foodResults[0]; // Take the first result
+            const calories = selectedFood.foodNutrients.find(n => n.nutrientName.toLowerCase().includes('energy'))?.value || 0;
+            return `<strong>${foodName}</strong> - ${selectedFood.description} - ${calories} kcal`;
+        } else {
+            return `<strong>${foodName}</strong> - No USDA data found`;
+        }
+    }
+
     submitMealsButton.addEventListener('click', async () => {
-        console.log('Submit Meals Button clicked');  // Log when the button is clicked
-        let mealHistory = '';  // Initialize meal history as an empty string
-        totalCalories = 0;  // Reset total calories to 0 each time the button is pressed
+        let mealHistory = '';
+        totalCalories = 0;
 
-        // Loop through each textarea to process meal entries
+        // Loop through all the meal input fields
         for (let input of mealEntryInputs) {
-            const entryDetails = input.value.trim().split('-');  // Format expected: MealName - Calories
-            const foodName = entryDetails[0].trim();
-            const calories = parseInt(entryDetails[1]) || 0;  // Parse calories; default to 0 if invalid
+            const foodName = input.value.trim();
+            if (!foodName) continue;
 
-            console.log(`Processing meal: ${foodName}, Calories: ${calories}`);  // Log each meal being processed
+            // Check if the input is in the format "food name - calories" (manual entry)
+            const manualEntryParts = foodName.split(' - ').map(part => part.trim());
+            if (manualEntryParts.length === 2 && !isNaN(manualEntryParts[1])) {
+                const mealEntry = handleManualEntry(manualEntryParts[0], parseInt(manualEntryParts[1]));
+                mealHistory += mealEntry + '<br>';
+                totalCalories += parseInt(manualEntryParts[1]);
+            } else {
+                // Else, call the API to fetch the food data
+                const apiEntry = await handleAPIEntry(foodName);
+                mealHistory += apiEntry + '<br>';
 
-            totalCalories += calories;  // Add the entered calories to the total
-
-            if (foodName) {
-                const foodResults = await searchUSDAFood(foodName);  // Search USDA for the food item
-                if (foodResults && foodResults.length > 0) {
-                    mealHistory += `<strong>${foodName}</strong> - ${foodResults[0].description} - ${calories} kcal<br>`;
-                } else {
-                    mealHistory += `<strong>${foodName}</strong> - No USDA data found - ${calories} kcal<br>`;
+                // Extract calories from the API response and update totalCalories
+                const apiCalories = apiEntry.match(/(\d+) kcal/);
+                if (apiCalories) {
+                    totalCalories += parseInt(apiCalories[1]);
                 }
             }
         }
 
-        console.log(`Total Calories: ${totalCalories}`);  // Log the total calories after processing all meals
-
-        // Update meal history log
+        // Display the meal history and total calories
         historyLog.innerHTML = mealHistory || 'No entries yet.';
-
-        // Update total calories consumed display
         calorieTotalDisplay.textContent = `${totalCalories} kcal`;
-
-        // Update daily summary display
         dailySummaryDisplay.textContent = `Today's Summary: ${totalCalories} kcal consumed.`;
-
-        console.log('Meal submission complete.');  // Log that the meal submission process is complete
     });
-
-    // Optional: Render the calendar for the month (Just an example, you can update this as needed)
-    const calendar = document.querySelector('.calendar');
-    for (let i = 1; i <= 30; i++) {
-        const day = document.createElement('div');
-        day.textContent = i;
-        calendar.appendChild(day);
-    }
 });
+
+
+
+
+
+
 
