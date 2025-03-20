@@ -37,28 +37,6 @@ const userEmailDisplay = document.getElementById("userEmail");
 // Previous state for undo functionality
 let previousState = {};
 
-// Show Profile Modal
-profileNav.addEventListener("click", () => {
-    profileModal.classList.add("show");
-});
-
-// Close Profile Modal
-closeProfile.addEventListener("click", () => {
-    profileModal.classList.remove("show");
-});
-
-// Logout Functionality
-logoutButton.addEventListener("click", () => {
-    signOut(auth)
-        .then(() => {
-            alert("Logged out successfully!");
-            window.location.href = "sign-in.html";
-        })
-        .catch((error) => {
-            console.error("Error logging out:", error);
-        });
-});
-
 // Function to calculate calories burned from steps
 const calculateCaloriesFromSteps = (steps) => {
     const caloriesPerStep = 0.04; // Average calories burned per step
@@ -256,7 +234,6 @@ const undoLastEntry = async () => {
 // Monitor authentication state
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        userEmailDisplay.textContent = `Logged in as: ${user.email}`;
         loadHealthData();
     } else {
         window.location.href = "sign-in.html"; // Redirect to login if not authenticated
@@ -264,5 +241,11 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // Attach event listeners to buttons
-saveButton.addEventListener("click", saveHealthData);
-undoButton.addEventListener("click", undoLastEntry);
+saveButton.addEventListener("click", () => {
+    console.log("Save button clicked"); // Debug log
+    saveHealthData();
+});
+undoButton.addEventListener("click", () => {
+    console.log("Undo button clicked"); // Debug log
+    undoLastEntry();
+});
