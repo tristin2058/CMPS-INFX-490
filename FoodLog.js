@@ -1,68 +1,105 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const mealEntryInputs = document.querySelectorAll('textarea');
-    const submitMealsButton = document.querySelector('#submit-meals-button'); // Ensure the correct button is selected
+    const submitMealsButton = document.querySelector('#submit-meals-button');
     const historyLog = document.querySelector('.history-log p');
     const calorieTotalDisplay = document.getElementById('calories-consumed');
-    const dailySummaryDisplay = document.getElementById('daily-summary'); // Display for daily summary
-    let totalCalories = 0;  // Initialize total calories to 0
+    const dailySummaryDisplay = document.getElementById('daily-summary');
+    const mealEntryInputs = document.querySelectorAll('textarea');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotSend = document.getElementById('chatbot-send');
+    const chatbotResponse = document.getElementById('chatbot-response');
 
-    // Function to search USDA food data (mock example, replace with actual API if needed)
-    async function searchUSDAFood(query) {
-        console.log(`Searching for food: ${query}`);  // Log the food search query
-        // For now, mock the API response for food items.
-        // This is where you'd use the actual USDA API or mock data.
-        return [{
-            description: `${query} (mock data)`,
-            calories: 100  // Mocking 100 calories for any food entered
-        }];
+    let totalCalories = 0;
+    const USDA_API_KEY = 'TlJi5aBkuJ2ur7CEppmSTrKsCKCdNftjRWJhLrd5';
+    const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
+
+    async function getChatbotResponse(userMessage) {
+        try {
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `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`, 
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o-mini",
+                    messages: [{ role: "user", content: userMessage }],
+                    max_tokens: 100
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        } catch (error) {
+            console.error("Error getting chatbot response:", error);
+            return "I'm sorry, I couldn't process that request. Please try again.";
+        }
     }
 
-    // Event listener for Submit Meals Button
+    chatbotSend.addEventListener('click', async () => {
+        const userMessage = chatbotInput.value.trim();
+        if (!userMessage) return;
+
+        chatbotResponse.innerHTML = "<p>Thinking...</p>";
+        const botReply = await getChatbotResponse(userMessage);
+        chatbotResponse.innerHTML = `<p><strong>AI Bot:</strong> ${botReply}</p>`;
+    });
+
+    async function searchUSDAFood(query) {
+        try {
+            const response = await fetch(`${USDA_API_URL}?query=${query}&api_key=${USDA_API_KEY}`);
+            const data = await response.json();
+            return data.foods || [];
+        } catch (error) {
+            console.error('Error fetching food data:', error);
+            return [];
+        }
+    }
+
     submitMealsButton.addEventListener('click', async () => {
-        console.log('Submit Meals Button clicked');  // Log when the button is clicked
-        let mealHistory = '';  // Initialize meal history as an empty string
-        totalCalories = 0;  // Reset total calories to 0 each time the button is pressed
+        let mealHistory = '';
+        totalCalories = 0;
 
-        // Loop through each textarea to process meal entries
         for (let input of mealEntryInputs) {
-            const entryDetails = input.value.trim().split('-');  // Format expected: MealName - Calories
-            const foodName = entryDetails[0].trim();
-            const calories = parseInt(entryDetails[1]) || 0;  // Parse calories; default to 0 if invalid
+            const mealType = input.id;
+            const foodEntries = input.value.trim().split('\\n').slice(0, 5);
 
-            console.log(`Processing meal: ${foodName}, Calories: ${calories}`);  // Log each meal being processed
-
-            totalCalories += calories;  // Add the entered calories to the total
-
-            if (foodName) {
-                const foodResults = await searchUSDAFood(foodName);  // Search USDA for the food item
-                if (foodResults && foodResults.length > 0) {
-                    mealHistory += `<strong>${foodName}</strong> - ${foodResults[0].description} - ${calories} kcal<br>`;
-                } else {
-                    mealHistory += `<strong>${foodName}</strong> - No USDA data found - ${calories} kcal<br>`;
-                }
+            for (let entry of foodEntries) {
+                const [foodName, calories] = entry.split('-').map(str => str.trim());
+                if (!foodName || isNaN(calories)) continue;
+                totalCalories += Number(calories);
+                mealHistory += `<strong>${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</strong>: ${foodName} - ${calories} kcal<br>`;
             }
         }
 
-        console.log(`Total Calories: ${totalCalories}`);  // Log the total calories after processing all meals
-
-        // Update meal history log
         historyLog.innerHTML = mealHistory || 'No entries yet.';
-
-        // Update total calories consumed display
         calorieTotalDisplay.textContent = `${totalCalories} kcal`;
-
-        // Update daily summary display
         dailySummaryDisplay.textContent = `Today's Summary: ${totalCalories} kcal consumed.`;
-
-        console.log('Meal submission complete.');  // Log that the meal submission process is complete
     });
 
-    // Optional: Render the calendar for the month (Just an example, you can update this as needed)
-    const calendar = document.querySelector('.calendar');
-    for (let i = 1; i <= 30; i++) {
-        const day = document.createElement('div');
-        day.textContent = i;
-        calendar.appendChild(day);
-    }
-});
+    const calendarDiv = document.querySelector('.calendar');
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
 
+    function renderCalendar(month, year) {
+        const firstDay = new Date(year, month).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        let calendarHTML = '';
+
+        for (let i = 0; i < firstDay; i++) {
+            calendarHTML += `<div class="empty"></div>`;
+        }
+
+        for (let day = 1; day <= lastDate; day++) {
+            calendarHTML += `<div class="day">${day}</div>`;
+        }
+
+        calendarDiv.innerHTML = calendarHTML;
+    }
+
+    renderCalendar(currentMonth, currentYear);
+});

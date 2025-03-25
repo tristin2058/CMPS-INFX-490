@@ -5,135 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Log</title>
     <link rel="stylesheet" href="FoodLog.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            background-color: #f3f4f6;
-        }
-        .taskbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #2D3748;
-            padding: 15px 30px;
-            color: #E2E8F0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .nav-links {
-            display: flex;
-            flex: 1;
-            justify-content: center;
-            gap: 60px;
-        }
-        .nav-links a {
-            color: #E2E8F0;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-        .nav-links a:hover {
-            color: #63B3ED;
-        }
-        .profile-dropdown {
-            position: relative;
-        }
-        .profile-button {
-            background-color: #63B3ED;
-            color: #2D3748;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: #1A202C;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 10px 0;
-            z-index: 1;
-        }
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 20px;
-            color: #E2E8F0;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-        .dropdown-menu a:hover {
-            background-color: #2D3748;
-        }
-        .profile-button:hover + .dropdown-menu,
-        .dropdown-menu:hover {
-            display: block;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+
 </head>
 <body>
-    <div class="taskbar">
-        <div class="nav-links">
-            <a href="dashboard.html">Home</a>
-            <a href="FoodLog.html">Food Log</a>
-            <a href="exercise-logging.html">Exercise Log</a>
-            <a href="#">History</a>
-        </div>
-        <div class="profile-dropdown">
-            <button class="profile-button">Profile ▼</button>
-            <div class="dropdown-menu">
-                <a href="Profile.html">View Profile</a>
-                <a href="#">Settings</a>
-                <a href="sign-in.html">Logout</a>
-            </div>
-        </div>
-    </div>
-    
-    <header>Food Log Tracker</header>
-
+    <script src="taskbar.js"></script>
     <div class="container">
-        <!-- Calendar Section -->
         <div class="history-tracker">
             <h2>Calendar</h2>
             <div class="calendar"></div>
         </div>
-
-        <!-- Meal Entries Section -->
         <div class="meal-entries">
             <h2>Meal Entries</h2>
-            <textarea placeholder="Breakfast ex: eggs - 100"></textarea>
-            <textarea placeholder="Lunch ex: burger - 300"></textarea>
-            <textarea placeholder="Dinner ex steak - 450"></textarea>
+            <textarea id="breakfast" placeholder="Breakfast (max 5 entries) ex: eggs - 100"></textarea>
+            <textarea id="lunch" placeholder="Lunch (max 5 entries) ex: burger - 300"></textarea>
+            <textarea id="dinner" placeholder="Dinner (max 5 entries) ex steak - 450"></textarea>
             <button id="submit-meals-button">Submit Meals</button>
         </div>
-
-        <!-- Daily Summary Section -->
         <div class="daily-summary">
             <h2>Daily Summary</h2>
-            <p>Calories Consumed: <span id="calories-consumed">0</span></p>
-            <p>Calories Burned: <span id="calories-burned">0</span></p>
+            <p id="summaryDisplay">Enter your meals to see the summary.</p>
         </div>
-
-        <!-- AI Help Bot Section -->
         <div class="ai-help-bot">
             <h2>AI Health Bot</h2>
             <p>Need tips or guidance? Ask the bot!</p>
-            <button>Chat with Bot</button>
+            <textarea id="chatbot-input" placeholder="Ask me anything about food and nutrition..."></textarea>
+            <button id="chatbot-send">Send</button>
+            <div id="chatbot-response"></div>
         </div>
-
-        <!-- Meal History Section -->
         <div class="history-log">
             <h2>Meal History</h2>
-            <p>No entries yet.</p>
+            <p id="mealHistory">Enter meals to see the history.</p>
         </div>
     </div>
 
-    <script src="FoodLog.js"></script>
+    <script type="module" src="FoodLog.js"></script>
 </body>
 </html>
-
