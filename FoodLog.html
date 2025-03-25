@@ -5,16 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Log</title>
     <link rel="stylesheet" href="FoodLog.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            background-color: #f3f4f6;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+
 </head>
 <body>
     <script src="taskbar.js"></script>
@@ -48,7 +41,9 @@
         <div class="ai-help-bot">
             <h2>AI Health Bot</h2>
             <p>Need tips or guidance? Ask the bot!</p>
-            <button>Chat with Bot</button>
+            <textarea id="chatbot-input" placeholder="Ask me anything about food and nutrition..."></textarea>
+            <button id="chatbot-send">Send</button>
+            <div id="chatbot-response"></div>
         </div>
 
         <!-- Meal History Section -->
@@ -58,89 +53,6 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mealEntryInputs = document.querySelectorAll('textarea');
-            const submitMealsButton = document.querySelector('#submit-meals-button');
-            const historyLog = document.querySelector('.history-log p');
-            const calorieTotalDisplay = document.getElementById('calories-consumed');
-            const dailySummaryDisplay = document.getElementById('daily-summary');
-            let totalCalories = 0;
-
-            const USDA_API_KEY = 'TlJi5aBkuJ2ur7CEppmSTrKsCKCdNftjRWJhLrd5'; // API key
-            const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
-
-            async function searchUSDAFood(query) {
-                try {
-                    const response = await fetch(`${USDA_API_URL}?query=${query}&api_key=${USDA_API_KEY}`);
-                    const data = await response.json();
-                    return data.foods || [];
-                } catch (error) {
-                    console.error('Error fetching food data:', error);
-                    return [];
-                }
-            }
-
-            submitMealsButton.addEventListener('click', async () => {
-                let mealHistory = '';
-                totalCalories = 0;
-
-                for (let input of mealEntryInputs) {
-                    const mealType = input.id; // Get meal type (breakfast, lunch, dinner)
-                    const foodEntries = input.value.trim().split('\n').slice(0, 5); // Limit to 5 entries
-
-                    for (let entry of foodEntries) {
-                        const [foodName, calories] = entry.split('-').map(str => str.trim());
-
-                        if (!foodName || !calories || isNaN(calories)) continue;
-
-                        // Use API search if no calorie data provided
-                        const foodResults = await searchUSDAFood(foodName);
-                        if (foodResults.length > 0) {
-                            const selectedFood = foodResults[0]; // Take the first result
-                            const apiCalories = selectedFood.foodNutrients.find(n => n.nutrientName.includes('Energy'))?.value || 0;
-
-                            totalCalories += Number(calories) || apiCalories;
-                            mealHistory += `<strong>${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</strong>: ${foodName} - ${calories} kcal<br>`;
-                        } else {
-                            mealHistory += `<strong>${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</strong>: ${foodName} - ${calories} kcal (Manual Entry)<br>`;
-                        }
-                    }
-                }
-
-                historyLog.innerHTML = mealHistory || 'No entries yet.';
-                calorieTotalDisplay.textContent = `${totalCalories} kcal`;
-                dailySummaryDisplay.textContent = `Today's Summary: ${totalCalories} kcal consumed.`;
-            });
-
-            // Calendar Section
-            const calendarDiv = document.querySelector('.calendar');
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth();
-            const currentYear = currentDate.getFullYear();
-
-            function renderCalendar(month, year) {
-                // Get first day of the month and number of days in the month
-                const firstDay = new Date(year, month).getDay();
-                const lastDate = new Date(year, month + 1, 0).getDate();
-                
-                let calendarHTML = '';
-
-                // Add blank spaces for the first row
-                for (let i = 0; i < firstDay; i++) {
-                    calendarHTML += `<div class="empty"></div>`;
-                }
-
-                // Add days to the calendar
-                for (let day = 1; day <= lastDate; day++) {
-                    calendarHTML += `<div class="day">${day}</div>`;
-                }
-
-                calendarDiv.innerHTML = calendarHTML;
-            }
-
-            renderCalendar(currentMonth, currentYear); // Initial render for current month
-        });
-    </script>
+    <script type="module" src="FoodLog.js"></script>
 </body>
 </html>
