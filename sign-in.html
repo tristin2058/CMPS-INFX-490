@@ -7,7 +7,13 @@
     <link rel="stylesheet" href="sign-in.css">
 </head>
 <body>
+    
     <div class="auth-container">
+
+        <div class="extra-info">
+            <p id="quoteDisplay">💡 Loading motivational quote...</p>
+        </div>
+
         <h1>Join Our Health & Fitness Community</h1>
 
         <!-- Register Section -->
@@ -16,10 +22,12 @@
             <form id="registerForm">
                 <input type="email" id="registerEmail" placeholder="Enter your email" required>
                 <input type="password" id="registerPassword" placeholder="Create a password" required>
-                <button type="submit">Sign Up</button>
+                <button type="submit">Sign-Up</button>
             </form>
             <p>Already have an account? <a id="showLogin" href="#">Log in</a></p>
         </div>
+
+
 
         <!-- Login Section -->
         <div id="loginSection" style="display: none;"> <!-- Hidden by default -->
@@ -31,6 +39,10 @@
             </form>
             <p>Don't have an account? <a id="showRegister" href="#">Sign up</a></p>
         </div>
+
+        
+
+
     </div>
 
     <script type="module" src="sign-in.js"></script>
