@@ -36,28 +36,6 @@ const userEmailDisplay = document.getElementById("userEmail");
 // Previous state for undo functionality
 let previousExerciseState = {};
 
-// Show Profile Modal
-profileNav.addEventListener("click", () => {
-    profileModal.classList.add("show");
-});
-
-// Close Profile Modal
-closeProfile.addEventListener("click", () => {
-    profileModal.classList.remove("show");
-});
-
-// Logout Functionality
-logoutButton.addEventListener("click", () => {
-    signOut(auth)
-        .then(() => {
-            alert("Logged out successfully!");
-            window.location.href = "sign-in.html";
-        })
-        .catch((error) => {
-            console.error("Error logging out:", error);
-        });
-});
-
 // Function to load and display saved exercise data
 const loadExerciseData = async () => {
     const user = auth.currentUser;
@@ -188,7 +166,7 @@ const saveExerciseData = async () => {
         console.log("Cumulative data saved:", updatedData);
 
         // Save historical exercise data
-        const exerciseHistoryRef = collection(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/exercises`);
+        const exerciseHistoryRef = collection(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Previous Exercises`);
         await addDoc(exerciseHistoryRef, {
             exercise: newExercise,
             duration: newDuration,
@@ -244,7 +222,7 @@ const undoLastExerciseEntry = async () => {
     }
 
     const exerciseType = exerciseTypeSelect.value;
-    const userDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise`, user.uid); // Use UID as document ID
+    const userDocRef = doc(db, `Exercise_Log/${exerciseType}/User's_Exercise`, user.uid); // Use UID as document ID
 
     try {
         // Restore the previous state
@@ -305,10 +283,12 @@ const updateInputFields = () => {
     }
 };
 
+document.addEventListener("DOMContentLoaded", updateInputFields);
+exerciseTypeSelect.addEventListener("change", updateInputFields);
+
 // Monitor authentication state
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        userEmailDisplay.textContent = `Logged in as: ${user.email}`;
         loadExerciseData();
     } else {
         window.location.href = "sign-in.html"; // Redirect to login if not authenticated

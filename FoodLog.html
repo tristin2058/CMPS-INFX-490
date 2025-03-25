@@ -11,17 +11,11 @@
 </head>
 <body>
     <script src="taskbar.js"></script>
-    
-    <header>Food Log Tracker</header>
-
     <div class="container">
-        <!-- Calendar Section -->
         <div class="history-tracker">
             <h2>Calendar</h2>
             <div class="calendar"></div>
         </div>
-
-        <!-- Meal Entries Section -->
         <div class="meal-entries">
             <h2>Meal Entries</h2>
             <textarea id="breakfast" placeholder="Breakfast (max 5 entries) ex: eggs - 100"></textarea>
@@ -29,15 +23,10 @@
             <textarea id="dinner" placeholder="Dinner (max 5 entries) ex steak - 450"></textarea>
             <button id="submit-meals-button">Submit Meals</button>
         </div>
-
-        <!-- Daily Summary Section -->
         <div class="daily-summary">
             <h2>Daily Summary</h2>
-            <p>Calories Consumed: <span id="calories-consumed">0</span></p>
-            <p>Calories Burned: <span id="calories-burned">0</span></p>
+            <p id="summaryDisplay">Enter your meals to see the summary.</p>
         </div>
-
-        <!-- AI Help Bot Section -->
         <div class="ai-help-bot">
             <h2>AI Health Bot</h2>
             <p>Need tips or guidance? Ask the bot!</p>
@@ -45,11 +34,9 @@
             <button id="chatbot-send">Send</button>
             <div id="chatbot-response"></div>
         </div>
-
-        <!-- Meal History Section -->
         <div class="history-log">
             <h2>Meal History</h2>
-            <p>No entries yet.</p>
+            <p id="mealHistory">Enter meals to see the history.</p>
         </div>
     </div>
 
