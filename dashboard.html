@@ -48,18 +48,41 @@
             <section class="overview">
                 <h2>Today's Overview</h2>
                 <div class="metrics">
-                    <div class="metric-card">
+                    <!-- Activity Metrics -->
+                    <div class="metric-card activity">
                         <h3>Steps</h3>
                         <p id="stepsDisplay">🚶 0</p>
+                        <h3>Distance</h3>
+                        <p id="distanceDisplay">📏 0 mi</p>
                     </div>
-                    <div class="metric-card">
-                        <h3>Calories Burned</h3>
-                        <p id="caloriesBurnedDisplay">🔥 0 kcal</p>
-                    </div>
-                    <div class="metric-card">
+                    <!-- Nutrition Metrics -->
+                    <div class="metric-card nutrition">
+                        <h3>Calories Eaten</h3>
+                        <p id="caloriesEatenDisplay">🍎 0 kcal</p>
                         <h3>Water Intake</h3>
                         <p id="waterIntakeDisplay">💧 0L</p>
                     </div>
+                    <!-- Fitness Metrics -->
+                    <div class="metric-card fitness">
+                        <h3>Calories Burned</h3>
+                        <p id="caloriesBurnedDisplay">🔥 0 kcal</p>
+                        <h3>Active Time</h3>
+                        <p id="activeTimeDisplay">⏱️ 0 min</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chart Section -->
+            <section class="charts">
+                <div class="chart-container">
+                    <h2>Weight History</h2>
+                    <canvas id="weightChart"></canvas>
+                    <h3>Current Weight</h3>
+                    <p id="weightDisplay"> 0 lbs</p>
+                </div>
+                <div class="chart-container">
+                    <h2>Weekly Activity</h2>
+                    <canvas id="activityChart"></canvas>
                 </div>
             </section>
 
