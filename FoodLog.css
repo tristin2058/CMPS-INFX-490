@@ -70,7 +70,7 @@ textarea:focus {
 }
 
 .calendar div:hover {
-    background-color: #d0e0d8;
+    background-color: #03a9ce;
 }
 
 button {
@@ -94,3 +94,4 @@ button:hover {
     font-weight: bold;
     color: #333;
 }
+
