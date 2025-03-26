@@ -17,24 +17,60 @@
                 <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
             </header>
 
-            <!-- Log Your Exercise Section -->
-            <section class="log-exercise">
-                <div class="exercise-card">
-                    <h2>Log Your Exercise</h2>
-                    <div class="exercise-inputs">
-                        <div class="input-box">
-                            <label for="exerciseType">Exercise Type:</label>
-                            <select id="exerciseType" required>
-                                <option value="Cardio">Cardio</option>
-                                <option value="Workouts">Workouts</option>
-                            </select>
+            <!-- Log Your Exercise and Exercise Lookup Sections -->
+            <section class="exercise-sections">
+                <!-- Log Your Exercise Section -->
+                <div class="log-exercise">
+                    <div class="exercise-card">
+                        <h2>Log Your Exercise</h2>
+                        <div class="exercise-inputs">
+                            <div class="input-box">
+                                <label for="exerciseType">Exercise Type:</label>
+                                <select id="exerciseType" required>
+                                    <option value="Cardio">Cardio</option>
+                                    <option value="Workouts">Workouts</option>
+                                </select>
+                            </div>
+                            <div id="dynamicInputs">
+                                <!-- Dynamic input fields will be inserted here -->
+                            </div>
                         </div>
-                        <div id="dynamicInputs">
-                            <!-- Dynamic input fields will be inserted here -->
+                        <button type="submit" class="btn-save-exercise">Save Exercise</button>
+                        <button type="button" class="btn-undo-exercise" style="display: none;">Undo Last Entry</button>
+                    </div>
+                </div>
+
+                <!-- Exercise Lookup Section -->
+                <div class="exercise-lookup">
+                    <div class="exercise-card">
+                        <h2>Exercise Lookup</h2>
+                        <div class="exercise-inputs" id="apiInputs">
+                            <!-- API input fields will be inserted here -->
+                            <div class="input-box">
+                                <label for="lookupExerciseName">Exercise Name:</label>
+                                <input type="text" id="lookupExerciseName" placeholder="Enter exercise name">
+                            </div>
+                            <div class="input-box">
+                                <label for="lookupExerciseType">Exercise Type:</label>
+                                <input type="text" id="lookupExerciseType" placeholder="Enter exercise type" oninput="showSuggestions(this, 'type')">
+                                <div id="typeSuggestions" class="suggestions"></div>
+                            </div>
+                            <div class="input-box">
+                                <label for="lookupMuscle">Muscle:</label>
+                                <input type="text" id="lookupMuscle" placeholder="Enter muscle" oninput="showSuggestions(this, 'muscle')">
+                                <div id="muscleSuggestions" class="suggestions"></div>
+                            </div>
+                            <div class="input-box">
+                                <label for="lookupDifficulty">Difficulty:</label>
+                                <input type="text" id="lookupDifficulty" placeholder="Enter difficulty" oninput="showSuggestions(this, 'difficulty')">
+                                <div id="difficultySuggestions" class="suggestions"></div>
+                            </div>
+                        </div>
+                        <button class="btn-fetch-exercise">Fetch Exercise</button>
+                        <div id="exerciseOutput">
+                            <!-- Fetched exercises will be displayed here -->
                         </div>
                     </div>
-                    <button type="submit" class="btn-save-exercise">Save Exercise</button>
-                    <button type="button" class="btn-undo-exercise" style="display: none;">Undo Last Entry</button>
                 </div>
             </section>
 
