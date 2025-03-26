@@ -1,8 +1,16 @@
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  doc,
+  setDoc,
+  updateDoc,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Profile and logout elements
 const logoutButton = document.getElementById("logoutButton");
 const displayName = document.getElementById("displayName");
 const username = document.getElementById("username");
@@ -12,12 +20,12 @@ const height = document.getElementById("height");
 const weight = document.getElementById("weight");
 const gender = document.getElementById("gender");
 const bmi = document.getElementById("bmi");
-const goals = document.getElementById("goals");
-const milestones = document.getElementById("milestones");
-const logHistory = document.getElementById("logHistory");
-const charts = document.getElementById("charts");
+const bmiStatusEl = document.getElementById("bmiStatus");
+const registeredAtEl = document.getElementById("registeredAt");
+const lastLoginEl = document.getElementById("lastLogin");
+const profileImage = document.getElementById("profileImage");
+const profileImageInput = document.getElementById("profileImageInput");
 
-// Edit Profile elements
 const editProfileButton = document.getElementById("editProfileButton");
 const saveProfileButton = document.getElementById("saveProfileButton");
 const cancelEditButton = document.getElementById("cancelEditButton");
@@ -29,224 +37,177 @@ const editGender = document.getElementById("editGender");
 const heightUnit = document.getElementById("heightUnit");
 const weightUnit = document.getElementById("weightUnit");
 
-// Clear input fields on page load
-window.addEventListener('load', () => {
-    editBio.value = "";
-    editAge.value = "";
-    editHeight.value = "";
-    editWeight.value = "";
-    editGender.value = "";
-    heightUnit.value = "cm"; // Default to cm
-    weightUnit.value = "kg"; // Default to kg
-});
+function getHealthStatus(bmi) {
+  const value = parseFloat(bmi);
+  if (isNaN(value)) return { label: "Unknown", color: "#999" };
+  if (value < 18.5) return { label: "Underweight", color: "#2196f3" };
+  if (value < 25) return { label: "Normal", color: "#4caf50" };
+  if (value < 30) return { label: "Overweight", color: "#ff9800" };
+  return { label: "Obese", color: "#f44336" };
+}
 
-// Monitor authentication state
+function updateDOM(data, user) {
+  displayName.textContent = data.displayName;
+  username.textContent = `@${data.username}`;
+  bio.textContent = data.bio || "";
+  age.textContent = `Age: ${data.age}`;
+  height.textContent = `Height: ${data.height}`;
+  weight.textContent = `Weight: ${data.weight}`;
+  gender.textContent = `Gender: ${data.gender}`;
+  bmi.textContent = `BMI: ${data.bmi}`;
+
+  const status = getHealthStatus(data.bmi);
+  bmiStatusEl.textContent = status.label;
+  bmiStatusEl.style.color = status.color;
+  bmiStatusEl.style.fontWeight = "bold";
+
+  if (registeredAtEl && data.registeredAt?.toDate) {
+    const friendlyDate = data.registeredAt.toDate().toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+    registeredAtEl.textContent = friendlyDate;
+  } else {
+    registeredAtEl.textContent = "—";
+  }
+
+  if (lastLoginEl && user.metadata?.lastSignInTime) {
+    lastLoginEl.textContent = new Date(user.metadata.lastSignInTime).toLocaleString();
+  }
+
+  if (data.localImageBase64) {
+    profileImage.src = data.localImageBase64;
+  }
+
+  editBio.value = data.bio || "";
+  editAge.value = data.age || "";
+  editHeight.value = data.height?.split(" ")[0] || "";
+  heightUnit.value = data.height?.split(" ")[1] || "cm";
+  editWeight.value = data.weight?.split(" ")[0] || "";
+  weightUnit.value = data.weight?.split(" ")[1] || "kg";
+  editGender.value = data.gender || "";
+}
+
 onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const userDocRef = doc(db, "profile", user.uid); // Update to use 'profile' collection
-        const userDocSnap = await getDoc(userDocRef);
+  if (!user) return (window.location.href = "sign-in.html");
 
-        if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            displayName.textContent = userData.displayName || "Display Name";
-            username.textContent = `@${userData.username || "name"}`;
-            bio.textContent = userData.bio || "Bio section";
-            age.textContent = `Age: ${userData.age || ""}`;
-            height.textContent = `Height: ${userData.height || ""}`;
-            weight.textContent = `Weight: ${userData.weight || ""}`;
-            gender.textContent = `Gender: ${userData.gender || ""}`;
-            bmi.textContent = `BMI: ${userData.bmi || ""}`;
-            goals.textContent = userData.goals || "User can put things that they’re trying to achieve like losing a certain amount of weight";
-            milestones.textContent = userData.milestones || "User can pin previous goals that they met recently";
-            logHistory.textContent = userData.logHistory || "Recent log history";
-            charts.textContent = userData.charts || "Some sort of graphs and charts based on recent logging history";
+  const docRef = doc(db, "profile", user.uid);
+  onSnapshot(docRef, async (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
 
-            // Populate edit form with current data
-            editBio.value = userData.bio || "";
-            editAge.value = userData.age || "";
-            editHeight.value = userData.height ? userData.height.split(" ")[0] : "";
-            heightUnit.value = userData.height ? userData.height.split(" ")[1] : "cm";
-            editWeight.value = userData.weight ? userData.weight.split(" ")[0] : "";
-            weightUnit.value = userData.weight ? userData.weight.split(" ")[1] : "kg";
-            editGender.value = userData.gender || "";
-        } else {
-            console.log("No such document!");
-        }
-    } else {
-        window.location.href = "sign-in.html"; // Redirect to login if not authenticated
+      // ✅ Patch missing registeredAt timestamp if absent
+      if (!data.registeredAt) {
+        await updateDoc(docRef, { registeredAt: serverTimestamp() });
+      }
+
+      updateDOM(data, user);
     }
+  });
 });
 
-// Show Edit Profile Inputs
+if (profileImageInput) {
+  profileImageInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      profileImage.src = base64Image;
+
+      const user = auth.currentUser;
+      if (user) {
+        const docRef = doc(db, "profile", user.uid);
+        await updateDoc(docRef, { localImageBase64: base64Image });
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 editProfileButton.addEventListener("click", () => {
-    bio.style.display = "none";
-    editBio.style.display = "block";
-    age.textContent = "Age: ";
-    editAge.style.display = "block";
-    height.textContent = "Height: ";
-    editHeight.style.display = "block";
-    heightUnit.style.display = "block";
-    weight.textContent = "Weight: ";
-    editWeight.style.display = "block";
-    weightUnit.style.display = "block";
-    gender.textContent = "Gender: ";
-    editGender.style.display = "block";
-    editProfileButton.style.display = "none";
-    saveProfileButton.style.display = "inline-block";
-    cancelEditButton.style.display = "inline-block";
+  bio.style.display = "none";
+  editBio.style.display = "block";
+  age.style.display = "none";
+  editAge.style.display = "inline-block";
+  height.style.display = "none";
+  editHeight.style.display = "inline-block";
+  heightUnit.style.display = "inline-block";
+  weight.style.display = "none";
+  editWeight.style.display = "inline-block";
+  weightUnit.style.display = "inline-block";
+  gender.style.display = "none";
+  editGender.style.display = "inline-block";
+  editProfileButton.style.display = "none";
+  saveProfileButton.style.display = "inline-block";
+  cancelEditButton.style.display = "inline-block";
 });
 
-// Cancel Edit Profile
 cancelEditButton.addEventListener("click", () => {
-    bio.style.display = "block";
-    editBio.style.display = "none";
-    age.style.display = "block";
-    editAge.style.display = "none";
-    height.style.display = "block";
-    editHeight.style.display = "none";
-    heightUnit.style.display = "none";
-    weight.style.display = "block";
-    editWeight.style.display = "none";
-    weightUnit.style.display = "none";
-    gender.style.display = "block";
-    editGender.style.display = "none";
-    editProfileButton.style.display = "inline-block";
-    saveProfileButton.style.display = "none";
-    cancelEditButton.style.display = "none";
+  bio.style.display = "block";
+  editBio.style.display = "none";
+  age.style.display = "block";
+  editAge.style.display = "none";
+  height.style.display = "block";
+  editHeight.style.display = "none";
+  heightUnit.style.display = "none";
+  weight.style.display = "block";
+  editWeight.style.display = "none";
+  weightUnit.style.display = "none";
+  gender.style.display = "block";
+  editGender.style.display = "none";
+  editProfileButton.style.display = "inline-block";
+  saveProfileButton.style.display = "none";
+  cancelEditButton.style.display = "none";
 });
 
-// Save Profile Changes
 saveProfileButton.addEventListener("click", async (e) => {
-    e.preventDefault();
-    console.log("Save button clicked"); // Debugging line
-    const user = auth.currentUser;
-    if (user) {
-        const userDocRef = doc(db, "profile", user.uid); // Update to use 'profile' collection
-        let heightValue = parseFloat(editHeight.value);
-        let heightDisplay = "";
-        let weightValue = parseFloat(editWeight.value);
-        let weightDisplay = "";
+  e.preventDefault();
+  const user = auth.currentUser;
+  if (!user) return;
 
-        // Convert height to meters or feet if necessary
-        if (heightUnit.value === "in" || heightUnit.value === "ft") {
-            const totalInches = heightUnit.value === "in" ? heightValue : heightValue * 12;
-            const feet = Math.floor(totalInches / 12);
-            const inches = totalInches % 12;
-            heightDisplay = `${feet} ft ${inches.toFixed(2)} in`;
-            heightValue = totalInches * 0.0254; // Convert inches to meters
-        } else {
-            const totalCm = heightUnit.value === "cm" ? heightValue : heightValue * 100;
-            const meters = Math.floor(totalCm / 100);
-            const cm = totalCm % 100;
-            heightDisplay = `${meters} m ${cm.toFixed(2)} cm`;
-            heightValue = totalCm / 100; // Convert cm to meters
-        }
+  const userDocRef = doc(db, "profile", user.uid);
+  let height = parseFloat(editHeight.value);
+  let weight = parseFloat(editWeight.value);
 
-        // Convert weight to kilograms or pounds if necessary
-        if (weightUnit.value === "lb") {
-            weightDisplay = `${weightValue.toFixed(2)} lb`;
-            weightValue = weightValue * 0.453592; // Convert pounds to kg
-        } else {
-            weightDisplay = `${weightValue.toFixed(2)} kg`;
-        }
+  if (heightUnit.value === "cm") height /= 100;
+  else if (heightUnit.value === "in") height *= 0.0254;
+  else if (heightUnit.value === "ft") height *= 0.3048;
 
-        // Calculate BMI
-        const bmiValue = weightValue / (heightValue * heightValue);
+  if (weightUnit.value === "lb") weight *= 0.453592;
 
-        const updatedData = {
-            bio: editBio.value,
-            age: parseInt(editAge.value, 10),
-            height: heightDisplay,
-            weight: weightDisplay,
-            gender: editGender.value,
-            bmi: bmiValue.toFixed(2),
-        };
+  const bmiValue = weight / (height * height);
+  const roundedBmi = parseFloat(bmiValue.toFixed(1));
 
-        console.log("Updated Data:", updatedData); // Debugging line
+  const updatedData = {
+    bio: editBio.value,
+    age: parseInt(editAge.value, 10),
+    height: `${editHeight.value} ${heightUnit.value}`,
+    weight: `${editWeight.value} ${weightUnit.value}`,
+    gender: editGender.value,
+    bmi: roundedBmi
+  };
 
-        try {
-            await setDoc(userDocRef, updatedData, { merge: true });
-            alert("Profile updated successfully!");
-            bio.textContent = updatedData.bio;
-            age.textContent = `Age: ${updatedData.age}`;
-            height.textContent = `Height: ${heightDisplay}`;
-            weight.textContent = `Weight: ${weightDisplay}`;
-            gender.textContent = `Gender: ${updatedData.gender}`;
-            bmi.textContent = `BMI: ${updatedData.bmi}`;
-            bio.style.display = "block";
-            editBio.style.display = "none";
-            age.style.display = "block";
-            editAge.style.display = "none";
-            height.style.display = "block";
-            editHeight.style.display = "none";
-            heightUnit.style.display = "none";
-            weight.style.display = "block";
-            editWeight.style.display = "none";
-            weightUnit.style.display = "none";
-            gender.style.display = "block";
-            editGender.style.display = "none";
-            editProfileButton.style.display = "inline-block";
-            saveProfileButton.style.display = "none";
-            cancelEditButton.style.display = "none";
-        } catch (error) {
-            console.error("Error updating profile: ", error);
-        }
-    } else {
-        console.log("No user is currently signed in."); // Debugging line
-    }
+  try {
+    await setDoc(userDocRef, updatedData, { merge: true });
+    alert("Profile updated successfully!");
+    cancelEditButton.click();
+  } catch (err) {
+    console.error("Error updating profile:", err);
+  }
 });
 
-weightUnit.addEventListener("change", () => {
-    let weightValue = parseFloat(editWeight.value);
-    if (isNaN(weightValue)) return;
-
-    if (weightUnit.value === "kg") {
-        // Convert from pounds to kilograms
-        editWeight.value = (weightValue * 0.453592).toFixed(2);
-    } else {
-        // Convert from kilograms to pounds
-        editWeight.value = (weightValue / 0.453592).toFixed(2);
-    }
-});
-
-let previousHeightUnit = heightUnit.value; // Track previous unit
-
-heightUnit.addEventListener("change", () => {
-    let heightValue = parseFloat(editHeight.value);
-    if (isNaN(heightValue)) return;
-
-    let newUnit = heightUnit.value;
-
-    // Convert from previous unit to cm first (universal base)
-    if (previousHeightUnit === "in") {
-        heightValue *= 2.54; // Inches to cm
-    } else if (previousHeightUnit === "ft") {
-        heightValue *= 30.48; // Feet to cm
-    } else if (previousHeightUnit === "m") {
-        heightValue *= 100; // Meters to cm
-    }
-
-    // Convert from cm to the new unit
-    if (newUnit === "in") {
-        heightValue /= 2.54; // cm to inches
-    } else if (newUnit === "ft") {
-        heightValue /= 30.48; // cm to feet
-    } else if (newUnit === "m") {
-        heightValue /= 100; // cm to meters
-    }
-
-    editHeight.value = heightValue.toFixed(2);
-    previousHeightUnit = newUnit; // Update previous unit for next change
-});
-
-// Logout Functionality
 logoutButton.addEventListener("click", () => {
-    signOut(auth)
-        .then(() => {
-            alert("Logged out successfully!");
-            window.location.href = "sign-in.html";
-        })
-        .catch((error) => {
-            console.error("Error logging out:", error);
-        });
+  signOut(auth)
+    .then(() => {
+      alert("Logged out successfully!");
+      window.location.href = "sign-in.html";
+    })
+    .catch((error) => {
+      console.error("Error logging out:", error);
+    });
 });
+
+
