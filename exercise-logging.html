@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Logging</title>
+    <link rel="stylesheet" href="exercise-logging.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <script src="TaskBar.js"></script>
+    <div class="layout">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Exercise Log</h1>
+                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
+            </header>
+
+            <!-- Log Your Exercise and Exercise Lookup Sections -->
+            <section class="exercise-sections">
+                <!-- Log Your Exercise Section -->
+                <div class="log-exercise">
+                    <div class="exercise-card">
+                        <h2>Log Your Exercise</h2>
+                        <div class="exercise-inputs">
+                            <div class="input-box">
+                                <label for="exerciseType">Exercise Type:</label>
+                                <select id="exerciseType" required>
+                                    <option value="Cardio">Cardio</option>
+                                    <option value="Workouts">Workouts</option>
+                                </select>
+                            </div>
+                            <div id="dynamicInputs">
+                                <!-- Dynamic input fields will be inserted here -->
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save-exercise">Save Exercise</button>
+                        <button type="button" class="btn-undo-exercise" style="display: none;">Undo Last Entry</button>
+                    </div>
+                </div>
+
+                <!-- Exercise Lookup Section -->
+                <div class="exercise-lookup">
+                    <div class="exercise-card">
+                        <h2>Exercise Lookup</h2>
+                        <div class="exercise-inputs" id="apiInputs">
+                            <!-- API input fields will be inserted here -->
+                            <div class="input-box">
+                                <label for="lookupExerciseName">Exercise Name:</label>
+                                <input type="text" id="lookupExerciseName" placeholder="Enter exercise name">
+                            </div>
+                            <div class="input-box">
+                                <label for="lookupExerciseType">Exercise Type:</label>
+                                <input type="text" id="lookupExerciseType" placeholder="Enter exercise type" oninput="showSuggestions(this, 'type')">
+                                <div id="typeSuggestions" class="suggestions"></div>
+                            </div>
+                            <div class="input-box">
+                                <label for="lookupMuscle">Muscle:</label>
+                                <input type="text" id="lookupMuscle" placeholder="Enter muscle" oninput="showSuggestions(this, 'muscle')">
+                                <div id="muscleSuggestions" class="suggestions"></div>
+                            </div>
+                            <div class="input-box">
+                                <label for="lookupDifficulty">Difficulty:</label>
+                                <input type="text" id="lookupDifficulty" placeholder="Enter difficulty" oninput="showSuggestions(this, 'difficulty')">
+                                <div id="difficultySuggestions" class="suggestions"></div>
+                            </div>
+                        </div>
+                        <button class="btn-fetch-exercise">Fetch Exercise</button>
+                        <div id="exerciseOutput">
+                            <!-- Fetched exercises will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Exercise Overview Section -->
+            <section class="overview">
+                <h2>Exercise Overview</h2>
+                <h3>Today's Most Recent Exercise</h3> <!-- Added text -->
+                
+                <div class="metrics">
+                    <!-- Cardio Section -->
+                    <div class="metric-card">
+                        <h3>Cardio Type</h3> <!-- Added heading for cardio type -->
+                        <p id="cardioTypeDisplay">None</p> <!-- Added element to display cardio type -->
+                    </div>
+                    <div class="metric-card">
+                        <h3>Distance</h3>
+                        <p id="cardioDistanceDisplay">0 km</p>
+                    </div>
+                    
+                    <!-- Workouts Section -->
+                    <div class="metric-card">
+                        <h3>Workout Type</h3> <!-- Added heading for workout type -->
+                        <p id="workoutTypeDisplay">None</p> <!-- Added element to display workout type -->
+                    </div>
+                    <div class="metric-card">
+                        <h3>Reps</h3>
+                        <p id="workoutRepsDisplay">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Sets</h3>
+                        <p id="workoutSetsDisplay">0</p>
+                    </div>
+                </div>
+                <h3>History</h3> <!-- Added text for history section -->
+                <!-- Exercise List -->
+                <div id="exerciseList">
+                    <!-- List of exercises will be displayed here -->
+                </div>
+            </section>
+        </main>
+    </div>
+<script type="module" src="exercise-logging.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Log</title>
+    <link rel="stylesheet" href="FoodLog.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <script src="taskbar.js"></script>
+
+    <div class="container">
+        <div class="history-tracker">
+            <h2>Calendar</h2>
+            <div class="calendar"></div>
+        </div>
+        <div class="meal-entries">
+            <h2>Meal Entries</h2>
+            <textarea id="breakfast" placeholder="Breakfast (max 5 entries) ex: eggs - 100"></textarea>
+            <textarea id="lunch" placeholder="Lunch (max 5 entries) ex: burger - 300"></textarea>
+            <textarea id="dinner" placeholder="Dinner (max 5 entries) ex steak - 450"></textarea>
+            <button id="submit-meals-button">Submit Meals</button>
+        </div>
+        <div class="daily-summary">
+            <h2>Daily Summary</h2>
+            <p id="summaryDisplay">Enter your meals to see the summary.</p>
+        </div>
+        <div class="ai-help-bot">
+            <h2>AI Health Bot</h2>
+            <p>Need tips or guidance? Ask the bot!</p>
+            <textarea id="chatbot-input" placeholder="Ask me anything about food and nutrition..."></textarea>
+            <button id="chatbot-send">Send</button>
+            <div id="chatbot-response"></div>
+        </div>
+        <div class="history-log">
+            <h2>Meal History</h2>
+            <p id="mealHistory">Enter meals to see the history.</p>
+        </div>
+    </div>
+
+    <script src="FoodLog.js"></script>
+</body>
+</html>

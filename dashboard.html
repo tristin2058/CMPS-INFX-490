@@ -8,20 +8,11 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>Health Tracker</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="#" class="nav-link active" id="dashboardNav"><i class="fas fa-home"></i> Dashboard</a></li>
-                    <li><a href="#" class="nav-link" id="profileNav"><i class="fas fa-user"></i> Profile</a></li>
-                </ul>
-            </nav>
-        </aside>
+    
+    <!-- Taskbar -->
+    <script src="taskbar.js"></script> 
 
+    <div class="layout">
         <!-- Main Content -->
         <main class="main-content">
             <header class="main-header">
@@ -39,15 +30,17 @@
                             <input type="number" id="steps" placeholder="Enter steps" required>
                         </div>
                         <div class="input-box">
-                            <label for="caloriesBurned">Calories Burned:</label>
-                            <input type="number" id="caloriesBurned" placeholder="Enter calories burned" required>
-                        </div>
-                        <div class="input-box">
-                            <label for="waterIntake">Water Intake (L):</label>
-                            <input type="number" id="waterIntake" step="0.1" placeholder="Enter water intake" required>
+                            <label for="waterIntake">Water Intake:</label>
+                            <input type="number" id="waterAmount" step="0.1" placeholder="Enter amount" required>
+                            <select id="waterUnit" required>
+                                <option value="liters">Liters</option>
+                                <option value="cups">Cups</option>
+                                <option value="gallons">Gallons</option>
+                            </select>
                         </div>
                     </div>
                     <button type="submit" class="btn-save">Save Data</button>
+                    <button type="button" class="btn-undo" style="display: none;">Undo Last Entry</button>
                 </div>
             </section>
 
@@ -69,25 +62,14 @@
                     </div>
                 </div>
             </section>
+
+            <!-- History Section -->
+            <section class="history">
+                <h2>History</h2>
+                <div id="historyList"></div>
+            </section>
         </main>
     </div>
-
-    <!-- Profile Modal -->
-    <div id="profileModal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Your Profile</h2>
-            <p id="userEmail">Loading...</p>
-            <button id="logoutButton" class="btn-danger">Logout</button>
-            <button id="closeProfile" class="btn-secondary">Cancel</button>
-        </div>
-    </div>
-
-    <script type="module" src="dashboard.js"></script>
+<script type="module" src="dashboard.js"></script>
 </body>
 </html>
-
-
-
-
-
-

@@ -23,12 +23,16 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ✅ Toggle between Login & Signup forms
-document.getElementById("showLogin")?.addEventListener("click", () => {
+document.getElementById("showLogin")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("registerForm").reset(); // Clear register form inputs
     document.getElementById("registerSection").style.display = "none";
     document.getElementById("loginSection").style.display = "block";
 });
 
-document.getElementById("showRegister")?.addEventListener("click", () => {
+document.getElementById("showRegister")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("loginForm").reset(); // Clear login form inputs
     document.getElementById("loginSection").style.display = "none";
     document.getElementById("registerSection").style.display = "block";
 });
@@ -85,4 +89,46 @@ if (logoutButton) {
                 alert(error.message);
             });
     });
+
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const quoteDisplay = document.getElementById('quoteDisplay');
+
+    try {
+        // ✅ Prevent API caching by adding a timestamp to the URL
+        let response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://zenquotes.io/api/random')}?nocache=${new Date().getTime()}`);
+        let data = await response.json();
+        let parsedData = JSON.parse(data.contents); // Parse the JSON from the proxy
+
+        console.log("ZenQuotes API Response:", parsedData); // Debugging
+
+        if (parsedData && Array.isArray(parsedData) && parsedData.length > 0 && parsedData[0].q && parsedData[0].a) {
+            quoteDisplay.innerText = `"${parsedData[0].q}" - ${parsedData[0].a}`;
+        } else {
+            throw new Error("Invalid data format from ZenQuotes");
+        }
+    } catch (error) {
+        console.error("Error fetching quote from ZenQuotes:", error);
+
+        // ✅ Fallback to Quotable API
+        try {
+            let response = await fetch(`https://api.quotable.io/random?nocache=${new Date().getTime()}`);
+            let data = await response.json();
+
+            console.log("Quotable API Response:", data); // Debugging
+
+            if (data && data.content && data.author) {
+                quoteDisplay.innerText = `"${data.content}" - ${data.author}`;
+            } else {
+                throw new Error("Invalid data format from Quotable API");
+            }
+        } catch (fallbackError) {
+            console.error("Error fetching quote from Quotable API:", fallbackError);
+
+            // ✅ Show a hardcoded motivational message as a last resort
+            quoteDisplay.innerText = "Keep pushing towards your goals! 💪";
+        }
+    }
+});
+
