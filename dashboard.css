@@ -197,7 +197,7 @@ body {
     z-index: 100; /* Ensures it appears above other elements */
 }
 .logo-btn img {
-    width: 75px; /* Slightly larger */
-    height: 75px;
+    width: 110px; /* Slightly larger */
+    height: 110px;
     display: block; /* Ensures image renders */
 }
