@@ -6,9 +6,28 @@
     <title>Health Tracker Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        .logo-btn {
+            position: absolute;
+            top: 30px; /* Pushed higher */
+            left: 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        .logo-btn img {
+            width: 110px; /* Adjusted for a better fit */
+            height: 110px; /* Ensuring proper scaling */
+        }
+    </style>
 </head>
 <body>
-    
+    <!-- Logo as a button to navigate to the dashboard -->
+    <button class="logo-btn" onclick="location.href='dashboard.html'">
+        <img src="360_transparent.png" alt="Logo">
+    </button>
+    </a>
     <!-- Taskbar -->
     <script src="taskbar.js"></script> 
 
@@ -62,7 +81,7 @@
                     </div>
                 </div>
             </section>
-
+            
             <!-- History Section -->
             <section class="history">
                 <h2>History</h2>
