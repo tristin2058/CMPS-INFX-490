@@ -184,17 +184,11 @@ body {
     border: 1px solid #ddd;
 }
 /*Logo */
-.logo {
-    position: absolute; /* Position it at the top left */
-    top: 10px; /* Adjust the top spacing */
-    left: 10px; /* Adjust the left spacing */
-    width: 150px; /* Set the width of the logo */
-    height: auto; /* Maintain aspect ratio */
-}
+
 .logo-btn {
     position: absolute;
-    top: 10px; /* Adjust height */
-    left: 10px;
+    top: 0px; /* Adjust height */
+    left: 50px;
     background: none;
     border: none;
     cursor: pointer;
@@ -203,7 +197,7 @@ body {
     z-index: 100; /* Ensures it appears above other elements */
 }
 .logo-btn img {
-    width: 100px; /* Slightly larger */
-    height: auto;
+    width: 75px; /* Slightly larger */
+    height: 75px;
     display: block; /* Ensures image renders */
 }
