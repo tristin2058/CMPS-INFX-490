@@ -50,11 +50,11 @@ function updateDOM(data, user) {
   displayName.textContent = data.displayName;
   username.textContent = `@${data.username}`;
   bio.textContent = data.bio || "";
-  age.textContent = `Age: ${data.age}`;
-  height.textContent = `Height: ${data.height}`;
-  weight.textContent = `Weight: ${data.weight}`;
-  gender.textContent = `Gender: ${data.gender}`;
-  bmi.textContent = `BMI: ${data.bmi}`;
+  age.textContent = data.age;
+  height.textContent = data.height;
+  weight.textContent = data.weight;
+  gender.textContent = data.gender;
+  bmi.textContent = data.bmi;
 
   const status = getHealthStatus(data.bmi);
   bmiStatusEl.textContent = status.label;
