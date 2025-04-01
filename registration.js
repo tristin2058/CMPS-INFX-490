@@ -3,6 +3,20 @@ import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebase
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const form = document.getElementById("registrationForm");
+const genderSelect = document.getElementById("gender");
+const genderOtherInput = document.getElementById("genderOther");
+
+// Show/hide "Other" gender input
+genderSelect.addEventListener("change", () => {
+  if (genderSelect.value === "Other") {
+    genderOtherInput.style.display = "block";
+    genderOtherInput.required = true;
+  } else {
+    genderOtherInput.style.display = "none";
+    genderOtherInput.required = false;
+  }
+});
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -11,7 +25,11 @@ form.addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const age = parseInt(document.getElementById("age").value);
-  const gender = document.getElementById("gender").value;
+  const gender =
+    genderSelect.value === "Other"
+      ? genderOtherInput.value.trim()
+      : genderSelect.value;
+
   const height = parseFloat(document.getElementById("height").value);
   const heightUnit = document.getElementById("heightUnit").value;
   const weight = parseFloat(document.getElementById("weight").value);
