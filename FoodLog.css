@@ -1,8 +1,10 @@
 /* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9; 
     margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: white;
+    min-height: 100vh;
     padding: 0;
     box-sizing: border-box;
 }
@@ -17,41 +19,48 @@ body {
 header {
     grid-column: span 3;
     text-align: center;
-    background-color: #007BFF; 
-    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #64d9ff;
     padding: 15px 0;
     font-weight: bold;
     font-size: 24px;
+    width: 100%;
+    border-bottom: 2px solid #64d9ff;
 }
 
-.user-profile {
-    float: right;
-    margin-right: 20px;
+/* Calendar Month Header */
+#calendar-month {
+    font-size: 20px;
+    color: #64d9ff;
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 /* Card Styling */
 .history-tracker, .meal-entries, .daily-summary, .ai-help-bot, .history-log {
-    background: linear-gradient(135deg, #f9f9fc, #eef3f8); /* Updated for consistency */
+    background: rgba(255, 255, 255, 0.05);
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     text-align: center;
+    color: white;
 }
 
 textarea {
     width: 100%;
     height: 60px;
     margin-bottom: 10px;
-    border: 2px solid #007BFF; 
+    border: 2px solid #64d9ff;
     border-radius: 5px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 textarea:focus {
     outline: none;
-    border-color: #0056b3;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    border-color: #3cc8f2;
+    box-shadow: 0 0 5px rgba(100, 217, 255, 0.5);
 }
 
 /* Calendar Styling */
@@ -62,7 +71,7 @@ textarea:focus {
 }
 
 .calendar div {
-    background-color: #e3e3e3;
+    background-color: rgba(255, 255, 255, 0.08);
     text-align: center;
     padding: 10px;
     border-radius: 5px;
@@ -70,12 +79,13 @@ textarea:focus {
 }
 
 .calendar div:hover {
-    background-color: #03a9ce;
+    background-color: #64d9ff;
+    color: #0f2027;
 }
 
 button {
-    background-color: #007BFF; /* Updated color */
-    color: #fff;
+    background-color: #64d9ff;
+    color: #0f2027;
     border: none;
     border-radius: 10px;
     padding: 12px 20px;
@@ -86,12 +96,27 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #3cc8f2;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 .daily-summary p {
     font-weight: bold;
-    color: #333;
+    color: #64d9ff;
 }
 
+/* Highlight Current Day */
+.current-date {
+    background-color: #64d9ff;
+    color: #64d9ff;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* Highlight Logged Days */
+.logged {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+
+  

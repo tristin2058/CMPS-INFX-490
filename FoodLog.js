@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const dailySummaryDisplay = document.getElementById("summaryDisplay");
     const mealEntryInputs = document.querySelectorAll("textarea");
     const calendarContainer = document.querySelector(".calendar");
+    const calendarMonth = document.querySelector("#calendar-month"); // For month display
 
     let totalCalories = 0;
     let selectedDate = getFormattedDate(new Date());
@@ -48,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         totalCalories = 0;
 
         for (let input of mealEntryInputs) {
-            const foodEntries = input.value.trim().split("\n").slice(0, 5); // Allow max 5 entries per meal type
+            const foodEntries = input.value.trim().split("\n").slice(0, 5);
 
             for (let entry of foodEntries) {
                 if (!entry) continue;
@@ -98,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const todayFormatted = getFormattedDate(today);
 
         calendarContainer.innerHTML = "";
+        calendarMonth.textContent = `${today.toLocaleString('default', { month: 'long' })} ${currentYear}`;
 
         for (let day = 1; day <= daysInMonth; day++) {
             const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -111,6 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (mealHistory[dateKey]) {
                 dayElement.classList.add("logged");
+                if (dateKey < todayFormatted) {
+                    dayElement.textContent = `${day} x`; // Mark past logged days with "x"
+                }
             }
 
             dayElement.addEventListener("click", () => {
@@ -125,3 +130,5 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCalendar();
     updateMealHistory();
 });
+
+
