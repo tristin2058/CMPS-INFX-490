@@ -129,3 +129,55 @@ button {
 button:hover {
   background-color: #019bb0;
 }
+
+/* Pronouns Section */
+.pronouns-control {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.pronouns-control label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+#pronounsField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#pronounsSelect,
+#pronounsCustom {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 14px;
+}
+
+#pronounsSelect:focus,
+#pronounsCustom:focus {
+  outline: none;
+  border-color: #00bcd4;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+#pronounsSelect option {
+  background-color: #1e2b35;
+  color: #fff;
+}
+
+.profile-pronouns {
+  margin-top: 4px;
+  font-size: 14px;
+  font-style: italic;
+  color: #aaa;
+}
+

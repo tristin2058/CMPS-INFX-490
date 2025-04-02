@@ -27,6 +27,35 @@
       <div>
         <h2 id="displayName">Display Name</h2>
         <p id="username">@username</p>
+
+        <!-- ✅ Pronouns Section -->
+        <div class="pronouns-control">
+          <label>
+            <input type="checkbox" id="enablePronouns" />
+            Show pronouns
+          </label>
+
+          <div id="pronounsField" style="display: none;">
+            <select id="pronounsSelect">
+              <option value="" disabled selected>Select pronouns</option>
+              <option value="He/Him">He/Him</option>
+              <option value="She/Her">She/Her</option>
+              <option value="They/Them">They/Them</option>
+              <option value="Any pronouns">Any pronouns</option>
+              <option value="Other">Other</option>
+            </select>
+            <input
+              type="text"
+              id="pronounsCustom"
+              placeholder="Enter your pronouns"
+              style="display: none;"
+            />
+          </div>
+
+          <p id="displayPronouns" class="profile-pronouns"></p>
+        </div>
+
+        <!-- Bio -->
         <div>
           <p id="bio">User bio goes here</p>
           <textarea id="editBio" style="display: none;"></textarea>
@@ -122,3 +151,4 @@
   </script>
 </body>
 </html>
+
