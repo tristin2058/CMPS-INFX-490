@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
-    <link rel="stylesheet" href="profile.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile</title>
+  <link rel="stylesheet" href="profile.css" />
 </head>
 <body>
     <!-- Logo as a button to navigate to the dashboard -->
@@ -101,7 +100,118 @@
             </section>
         </main>
     </div>
+  <header class="main-nav">
+    <h1>Thrive360</h1>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="logs.html">Log History</a>
+      <a href="sign-in.html" onclick="event.preventDefault(); logout();">Sign Out</a>
+    </nav>
+  </header>
 
-    <script type="module" src="profile.js"></script>
+  <main>
+    <!-- Profile Picture and Basic Info -->
+    <section class="profile-header">
+      <div>
+        <img id="profileImage" src="place-holder-image.jpg" alt="Profile Picture" />
+        <input type="file" id="profileImageInput" />
+      </div>
+      <div>
+        <h2 id="displayName">Display Name</h2>
+        <p id="username">@username</p>
+        <div>
+          <p id="bio">User bio goes here</p>
+          <textarea id="editBio" style="display: none;"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="stat-card">
+        <h3>Age</h3>
+        <p id="age"></p>
+        <input id="editAge" type="number" style="display: none;" />
+      </div>
+      <div class="stat-card">
+        <h3>Height</h3>
+        <p id="height"></p>
+        <input id="editHeight" type="text" style="display: none;" />
+        <select id="heightUnit" style="display: none;">
+          <option value="cm">cm</option>
+          <option value="in">in</option>
+          <option value="ft">ft</option>
+        </select>
+      </div>
+      <div class="stat-card">
+        <h3>Weight</h3>
+        <p id="weight"></p>
+        <input id="editWeight" type="number" style="display: none;" />
+        <select id="weightUnit" style="display: none;">
+          <option value="kg">kg</option>
+          <option value="lb">lb</option>
+        </select>
+      </div>
+      <div class="stat-card">
+        <h3>Gender</h3>
+        <p id="gender"></p>
+        <input id="editGender" type="text" style="display: none;" />
+      </div>
+      <div class="stat-card">
+        <h3>BMI</h3>
+        <p><span id="bmi"></span> <span id="bmiStatus"></span></p>
+      </div>
+      <div class="stat-card">
+        <h3>Member Since</h3>
+        <p id="registeredAt">—</p>
+      </div>
+      <div class="stat-card">
+        <h3>Last Login</h3>
+        <p id="lastLogin">—</p>
+      </div>
+    </section>
+
+    <!-- Action Buttons -->
+    <section>
+      <button id="editProfileButton">Edit Profile</button>
+      <button id="saveProfileButton" style="display: none;">Save Changes</button>
+      <button id="cancelEditButton" style="display: none;">Cancel</button>
+    </section>
+
+    <!-- Dashboard Style Cards -->
+    <section class="dashboard-section">
+      <div class="dashboard-card">
+        <h3>Current Goals</h3>
+        <p id="goals">[Coming Soon]</p>
+      </div>
+      <div class="dashboard-card">
+        <h3>Milestones</h3>
+        <p id="milestones">[Coming Soon]</p>
+      </div>
+      <div class="dashboard-card">
+        <h3>Recent Logs</h3>
+        <div id="logHistory">[Coming Soon]</div>
+      </div>
+      <div class="dashboard-card">
+        <h3>Progress Charts</h3>
+        <div id="charts">[Coming Soon]</div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="profile.js"></script>
+  <script>
+    function logout() {
+      import('./firebase-config.js').then(({ auth }) => {
+        import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js').then(({ signOut }) => {
+          signOut(auth).then(() => {
+            alert('Logged out successfully!');
+            window.location.href = 'sign-in.html';
+          });
+        });
+      });
+    }
+  </script>
 </body>
 </html>

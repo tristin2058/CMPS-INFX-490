@@ -5,22 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Tracker Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="profile.css" />
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
+
+<header class="main-nav">
+    <h1>Thrive360</h1>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="logs.html">Log History</a>
+      <a href="sign-in.html" onclick="event.preventDefault(); logout();">Sign Out</a>
+    </nav>
+  </header>
 <body>
+<<<<<<< Tyler
     <!-- Logo as a button to navigate to the dashboard -->
     <button class="logo-btn" onclick="location.href='dashboard.html'">
         <img src="360_transparent.png" alt="Logo">
     </button>
     <!-- Taskbar -->
     <script src="taskbar.js"></script> 
+=======
+
+>>>>>>> main
     <div class="layout">
         <!-- Main Content -->
         <main class="main-content">
-            <header class="main-header">
-                <h1>Welcome Back!</h1>
-                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
-            </header>
 
             <!-- Track Your Health Section -->
             <section class="track-health">
