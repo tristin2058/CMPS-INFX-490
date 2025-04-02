@@ -15,6 +15,16 @@ function createTaskbar() {
                 left: 0;
                 z-index: 1000;
             }
+            .logo {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+            .logo img {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+            }
             .nav-links {
                 display: flex;
                 flex: 1;
@@ -72,6 +82,11 @@ function createTaskbar() {
             }
         </style>
         <div class="taskbar">
+            <!-- Logo Section -->
+            <div class="logo" onclick="location.href='dashboard.html'">
+                <img src="360_transparent.png" alt="Thrive 360 Logo">
+                <span>Thrive 360°</span>
+            </div>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="FoodLog.html">Food Log</a>
