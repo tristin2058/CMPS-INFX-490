@@ -3,87 +3,90 @@ function createTaskbar() {
         <style>
             .taskbar {
                 display: flex;
-                justify-content: space-between;
+                justify-content: flex-end;
                 align-items: center;
-                background-color: #2D3748;
-                padding: 15px 30px;
+                background-color: rgba(15, 32, 39, 0.9); /* Updated background color */
+                padding: 15px 50px; /* Increased right padding */
                 color: #E2E8F0;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
                 width: 100%;
                 position: fixed;
                 top: 0;
-                left: 0;
+                left: -65px; /* Shifted taskbar to the left by 100px */
                 z-index: 1000;
             }
             .nav-links {
                 display: flex;
-                flex: 1;
-                justify-content: center;
                 gap: 40px;
+                align-items: center;
             }
             .nav-links a {
                 color: #E2E8F0;
                 text-decoration: none;
                 font-weight: bold;
-                transition: color 0.3s ease;
+                padding: 10px;
+                transition: background-color 0.3s ease;
+                border-radius: 5px;
+                font-size: 16px;
             }
             .nav-links a:hover {
-                color: #63B3ED;
-            }
-            .profile-dropdown {
-                position: relative;
-                margin-right: 40px;
-            }
-            .profile-button {
                 background-color: #63B3ED;
-                color: #2D3748;
+            }
+            .dropdown {
+                position: relative;
+            }
+            .dropdown button {
+                background: none;
                 border: none;
-                padding: 8px 15px;
-                border-radius: 20px;
-                cursor: pointer;
+                color: #E2E8F0;
                 font-weight: bold;
+                padding: 10px;
+                cursor: pointer;
+                font-size: 16px;
             }
             .dropdown-menu {
                 display: none;
                 position: absolute;
-                right: 0;
                 background-color: #1A202C;
+                border-radius: 5px;
+                overflow: hidden;
+                top: 100%;
+                left: 0;
+                min-width: 150px;
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-                border-radius: 8px;
-                padding: 10px 0;
-                z-index: 1;
             }
             .dropdown-menu a {
                 display: block;
-                padding: 10px 20px;
+                padding: 10px;
                 color: #E2E8F0;
                 text-decoration: none;
-                transition: background-color 0.3s ease;
+                font-size: 16px;
             }
             .dropdown-menu a:hover {
                 background-color: #2D3748;
             }
-            .profile-button:hover + .dropdown-menu,
-            .dropdown-menu:hover {
+            .dropdown:hover .dropdown-menu {
                 display: block;
             }
+            .sign-out {
+                color: #E53E3E;
+            }
             body {
-                padding-top: 70px; /* Ensures content is not hidden behind the taskbar */
+                padding-top: 70px;
             }
         </style>
         <div class="taskbar">
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
-                <a href="FoodLog.html">Food Log</a>
-                <a href="exercise-logging.html">Exercise Log</a>
-                <a href="#">History</a>
-            </div>
-            <div class="profile-dropdown">
-                <button class="profile-button">Profile ▼</button>
-                <div class="dropdown-menu">
-                    <a href="Profile.html">View Profile</a>
-                    <a href="sign-in.html">Logout</a>
+                <div class="dropdown">
+                    <button>Log History ▼</button>
+                    <div class="dropdown-menu">
+                        <a href="FoodLog.html">Food Log</a>
+                        <a href="exercise-logging.html">Exercise Log</a>
+                    </div>
                 </div>
+                <a href="Profile.html">Profile</a>
+                <a href="sign-in.html" class="sign-out">Sign Out</a>
             </div>
         </div>
     `;
