@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Account</title>
+  <link rel="stylesheet" href="registration.css" />
+</head>
+<body>
+  <div class="registration-bg">
+    <div class="registration-container">
+      <div class="form-card">
+        <h1>Create Your Fitness Profile</h1>
+        <form id="registrationForm">
+          <input type="text" id="displayName" placeholder="Display Name" required />
+          <input type="text" id="username" placeholder="Username" required />
+          <input type="email" id="email" placeholder="Email" required />
+          <input type="password" id="password" placeholder="Password" required />
+        
+          <!-- Age + Gender (inline) -->
+          <div class="inline-group">
+            <input type="number" id="age" placeholder="Age" required />
+            <select id="gender" required>
+              <option value="" disabled selected>Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Non-binary">Non-binary</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        
+          <!-- Hidden gender text input -->
+          <input type="text" id="genderOther" placeholder="Please specify" style="display: none;" />
+        
+          <!-- Height + Unit -->
+          <div class="inline-group">
+            <input type="number" id="height" placeholder="Height" required />
+            <select id="heightUnit" required>
+              <option value="ft">ft</option>
+              <option value="in">in</option>
+              <option value="cm">cm</option>
+              <option value="m">m</option>
+            </select>
+          </div>
+        
+          <!-- Weight + Unit -->
+          <div class="inline-group">
+            <input type="number" id="weight" placeholder="Weight" required />
+            <select id="weightUnit" required>
+              <option value="lb">lb</option>
+              <option value="kg">kg</option>
+            </select>
+          </div>
+        
+          <button type="submit">Register</button>
+        </form>
+        
+        <p class="alt-link">Already have an account? <a href="sign-in.html">Log in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="registration.js"></script>
+</body>
+</html>
+
+
+

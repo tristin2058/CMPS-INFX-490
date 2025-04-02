@@ -73,7 +73,7 @@ function createTaskbar() {
         </style>
         <div class="taskbar">
             <div class="nav-links">
-                <a href="dashboard.html">Home</a>
+                <a href="dashboard.html">Dashboard</a>
                 <a href="FoodLog.html">Food Log</a>
                 <a href="exercise-logging.html">Exercise Log</a>
                 <a href="#">History</a>
