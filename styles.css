@@ -29,36 +29,6 @@ body {
     min-height: 100vh;
 }
 
-/* New Taskbar Styling */
-header.main-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background: rgba(15, 32, 39, 0.9);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  }
-  
-  header.main-nav h1 {
-    font-size: 20px;
-    color: #00bcd4;
-    margin: 0;
-  }
-  
-  header.main-nav nav a {
-    margin-left: 20px;
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  header.main-nav nav a:hover {
-    text-decoration: underline;
-  }
-
 .dashboard-container {
     max-width: 1200px;
     margin: 0 auto;

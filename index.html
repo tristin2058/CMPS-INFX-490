@@ -7,22 +7,17 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="TaskBar.js"></script> <!-- Include TaskBar.js -->
 </head>
 <body>
     <!-- Taskbar -->
-    <header class="main-nav">
-        <h1>Thrive360</h1>
-        <nav>
-          <a href="dashboard.html">Dashboard</a>
-          <a href="profile.html">Profile</a>
-          <a href="logs.html">Log History</a>
-          <a href="sign-in.html" onclick="event.preventDefault(); logout();">Sign Out</a>
-        </nav>
-      </header>
+    <script>
+        createTaskbar(); <!-- Call the createTaskbar function -->
+    </script>
 
     <div class="dashboard-container">
         <header class="dashboard-header">
-            <h1>Thrive360 Dashboard</h1>
+            <h1>Dashboard</h1>
             <div class="date-display" id="current-date"></div>
         </header>
 

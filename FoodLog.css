@@ -1,9 +1,9 @@
 /* General Styles */
 body {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-    color: white;
+    color: #ffffff;
     min-height: 100vh;
     padding: 0;
     box-sizing: border-box;

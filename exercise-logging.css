@@ -1,10 +1,14 @@
 /* General Reset */
 body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: white;
     display: flex;
-    height: 100vh;
+    min-height: 100vh;
+    line-height: 1.6;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* Layout */
@@ -27,18 +31,6 @@ body {
     margin-bottom: 20px;
 }
 
-.profile-btn {
-    font-size: 24px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: #007BFF;
-}
-
-.profile-btn:hover {
-    color: #0056b3;
-}
-
 /* Exercise Sections Container */
 .exercise-sections {
     display: flex;
@@ -58,10 +50,10 @@ body {
 
 /* Exercise Card */
 .exercise-card {
-    background: linear-gradient(135deg, #f9f9fc, #eef3f8);
+    background: rgba(255, 255, 255, 0.05);
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     text-align: center;
     max-width: 500px;
     margin: 0 auto;
@@ -69,7 +61,7 @@ body {
 
 .exercise-card h2 {
     font-size: 24px;
-    color: #333;
+    color: #64d9ff;
     margin-bottom: 20px;
 }
 
@@ -77,23 +69,24 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 50px;
-    justify-content: center; /* Center the inputs horizontally */
+    justify-content: center;
     margin-bottom: 20px;
 }
 
 .input-box {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.15);
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 2px solid #64d9ff;
     border-radius: 10px;
     text-align: left;
+    position: relative;
 }
 
 .input-box label {
     width: 60%;
     display: block;
     font-size: 14px;
-    color: black; /* Changed text color to black */
+    color: white;
     background: #007BFF;
     padding: 5px;
     border-radius: 5px;
@@ -111,14 +104,14 @@ body {
 
 .input-box input:focus {
     outline: none;
-    border-color: #007BFF;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    border-color: #64d9ff;
+    box-shadow: 0 0 5px rgba(100, 217, 255, 0.5);
 }
 
 /* Save Button */
 .btn-save-exercise {
-    background: #007BFF;
-    color: white;
+    background: #64d9ff;
+    color: #0f2027;
     font-size: 16px;
     padding: 12px 20px;
     border: none;
@@ -129,7 +122,7 @@ body {
 }
 
 .btn-save-exercise:hover {
-    background: #0056b3;
+    background: #3cc8f2;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -144,7 +137,7 @@ body {
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    display: none; /* Initially hidden */
+    display: none;
 }
 
 .btn-undo-exercise:hover {
@@ -160,7 +153,7 @@ body {
 
 .metric-card {
     flex: 1;
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
     padding: 20px;
     text-align: center;
     border-radius: 10px;
@@ -173,7 +166,7 @@ body {
 }
 
 .exercise-item {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.08);
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -228,11 +221,6 @@ body {
     background: #f4f4f9;
     color: #333;
     border: 1px solid #ddd;
-}
-
-/* Ensure the input-box is relative for positioning */
-.input-box {
-    position: relative;
 }
 
 /* Styling for the dropdown suggestions */
