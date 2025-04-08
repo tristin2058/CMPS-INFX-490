@@ -3,77 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Tracker Dashboard</title>
+    <title>Thrive360 Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="profile.css" />
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </head>
-
-<header class="main-nav">
-    <h1>Thrive360</h1>
-    <nav>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="profile.html">Profile</a>
-      <a href="logs.html">Log History</a>
-      <a href="sign-in.html" onclick="event.preventDefault(); logout();">Sign Out</a>
-    </nav>
-  </header>
 <body>
+    <!-- Taskbar -->
+    <header class="main-nav">
+        <h1>Thrive360</h1>
+        <nav>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="profile.html">Profile</a>
+          <a href="logs.html">Log History</a>
+          <a href="sign-in.html" onclick="event.preventDefault(); logout();">Sign Out</a>
+        </nav>
+      </header>
 
-    <div class="layout">
-        <!-- Main Content -->
-        <main class="main-content">
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Welcome!</h1>
+            <div class="date-display" id="current-date"></div>
+        </header>
 
-            <!-- Track Your Health Section -->
-            <section class="track-health">
-                <div class="health-card">
-                    <h2>Track Your Health</h2>
-                    <div class="health-inputs">
-                        <div class="input-box">
-                            <label for="steps">Steps:</label>
-                            <input type="number" id="steps" placeholder="Enter steps" required>
+        <div class="main-content">
+            <div class="metrics-grid">
+                <!-- Activity Metrics -->
+                <div class="metric-card activity">
+                    <h2><i class="fas fa-walking"></i> Steps</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="steps-progress"></div>
+                        <span class="progress-text" id="steps-text">0/10,000</span>
+                    </div>
+                    <div class="metric-details">
+                        <div>
+                            <span class="detail-value" id="distance">0.0</span>
+                            <span class="detail-label">miles</span>
                         </div>
-                        <div class="input-box">
-                            <label for="waterIntake">Water Intake:</label>
-                            <input type="number" id="waterAmount" step="0.1" placeholder="Enter amount" required>
-                            <select id="waterUnit" required>
-                                <option value="liters">Liters</option>
-                                <option value="cups">Cups</option>
-                                <option value="gallons">Gallons</option>
-                            </select>
+                        <div>
+                            <span class="detail-value" id="active-time">0</span>
+                            <span class="detail-label">active mins</span>
                         </div>
-                    </div>
-                    <button type="submit" class="btn-save">Save Data</button>
-                    <button type="button" class="btn-undo" style="display: none;">Undo Last Entry</button>
-                </div>
-            </section>
-
-            <!-- Today's Overview Section -->
-            <section class="overview">
-                <h2>Today's Overview</h2>
-                <div class="metrics">
-                    <div class="metric-card">
-                        <h3>Steps</h3>
-                        <p id="stepsDisplay">🚶 0</p>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Calories Burned</h3>
-                        <p id="caloriesBurnedDisplay">🔥 0 kcal</p>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Water Intake</h3>
-                        <p id="waterIntakeDisplay">💧 0L</p>
                     </div>
                 </div>
-            </section>
 
-            <!-- History Section -->
-            <section class="history">
-                <h2>History</h2>
-                <div id="historyList"></div>
-            </section>
-        </main>
+                <!-- Nutrition Metrics -->
+                <div class="metric-card nutrition">
+                    <h2><i class="fas fa-utensils"></i> Nutrition</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="calories-progress"></div>
+                        <span class="progress-text" id="calories-text">0/2,000</span>
+                    </div>
+                    <div class="metric-details">
+                        <div>
+                            <span class="detail-value" id="protein">0</span>
+                            <span class="detail-label">g protein</span>
+                        </div>
+                        <div>
+                            <span class="detail-value" id="carbs">0</span>
+                            <span class="detail-label">g carbs</span>
+                        </div>
+                        <div>
+                            <span class="detail-value" id="fat">0</span>
+                            <span class="detail-label">g fat</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weight Metrics -->
+                <div class="metric-card weight">
+                    <h2><i class="fas fa-weight"></i> Weight</h2>
+                    <div class="current-weight">
+                        <span class="weight-value" id="current-weight">--</span>
+                        <span class="weight-unit">lbs</span>
+                    </div>
+                    <div class="weight-change">
+                        <span id="weight-change-amount">--</span>
+                        <span id="weight-change-direction"></span>
+                    </div>
+                    <button class="btn" id="log-weight-btn">Log Weight</button>
+                </div>
+
+                <!-- Sleep Metrics -->
+                <div class="metric-card sleep">
+                    <h2><i class="fas fa-bed"></i> Sleep</h2>
+                    <div class="sleep-metrics">
+                        <div>
+                            <span class="detail-value" id="sleep-duration">--</span>
+                            <span class="detail-label">hours</span>
+                        </div>
+                        <div>
+                            <span class="detail-value" id="sleep-quality">--</span>
+                            <span class="detail-label">quality</span>
+                        </div>
+                    </div>
+                    <div class="sleep-score">
+                        <div class="circular-progress" id="sleep-score-circle">
+                            <span class="circular-progress-text" id="sleep-score">--</span>
+                        </div>
+                        <span class="sleep-score-label">Sleep Score</span>
+                    </div>
+                </div>
+
+                <!-- Calories Burned -->
+                <div class="metric-card calories">
+                    <h2><i class="fas fa-fire"></i> Calories Burned</h2>
+                    <div class="calories-metrics">
+                        <div>
+                            <span class="detail-value" id="total-burned">--</span>
+                            <span class="detail-label">total</span>
+                        </div>
+                        <div>
+                            <span class="detail-value" id="exercise-burned">--</span>
+                            <span class="detail-label">exercise</span>
+                        </div>
+                    </div>
+                    <div class="calories-goal">
+                        <span>Daily Goal: </span>
+                        <span id="burn-goal">500</span>
+                    </div>
+                </div>
+
+                <!-- Water Intake -->
+                <div class="metric-card water">
+                    <h2><i class="fas fa-tint"></i> Water</h2>
+                    <div class="water-container">
+                        <div class="water-glasses">
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                        </div>
+                        <span class="water-text" id="water-text">0/8 glasses</span>
+                    </div>
+                    <button class="btn" id="add-water-btn">Add Glass</button>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3>Weight History</h3>
+                    <canvas id="weight-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Weekly Activity</h3>
+                    <canvas id="activity-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Log Meal</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-running"></i>
+                    <span>Start Workout</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-moon"></i>
+                    <span>Log Sleep</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </div>
     </div>
-<script type="module" src="dashboard.js"></script>
+
+    <!-- Weight Log Modal -->
+    <div class="modal" id="weight-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Log Weight</h2>
+            <div class="form-group">
+                <label for="weight-input">Current Weight (lbs)</label>
+                <input type="number" id="weight-input" step="0.1" placeholder="Enter your weight">
+            </div>
+            <button class="btn" id="submit-weight-btn">Submit</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Settings</h2>
+            
+            <div class="form-group">
+                <label>Unit System</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="unit-system" value="imperial" checked> Imperial (lbs, miles)
+                    </label>
+                    <label>
+                        <input type="radio" name="unit-system" value="metric"> Metric (kg, km)
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="step-goal">Daily Step Goal</label>
+                <input type="number" id="step-goal" placeholder="Enter step goal" value="10000">
+            </div>
+            
+            <div class="form-group">
+                <label for="calorie-goal">Daily Calorie Goal</label>
+                <input type="number" id="calorie-goal" placeholder="Enter calorie goal" value="2000">
+            </div>
+            
+            <div class="form-group">
+                <label for="water-goal">Daily Water Goal (glasses)</label>
+                <input type="number" id="water-goal" placeholder="Enter water goal" value="8">
+            </div>
+
+            <button class="btn" id="save-settings-btn">Save Settings</button>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
 </body>
 </html>

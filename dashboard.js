@@ -1,251 +1,398 @@
-import { auth, db } from "./firebase-config.js";
-import {
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-    collection,
-    doc,
-    getDoc,
-    setDoc,
-    updateDoc,
-    query,
-    where,
-    getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// Select input fields and buttons
-const stepsInput = document.getElementById("steps");
-const waterAmountInput = document.getElementById("waterAmount");
-const waterUnitSelect = document.getElementById("waterUnit");
-const saveButton = document.querySelector(".btn-save");
-const undoButton = document.querySelector(".btn-undo");
-
-// Display elements
-const stepsDisplay = document.getElementById("stepsDisplay");
-const caloriesDisplay = document.getElementById("caloriesBurnedDisplay");
-const waterDisplay = document.getElementById("waterIntakeDisplay");
-const historyList = document.getElementById("historyList");
-
-// Profile and logout elements
-const profileNav = document.getElementById("profileNav");
-const profileModal = document.getElementById("profileModal");
-const closeProfile = document.getElementById("closeProfile");
-const logoutButton = document.getElementById("logoutButton");
-const userEmailDisplay = document.getElementById("userEmail");
-
-// Previous state for undo functionality
-let previousState = {};
-
-// Function to calculate calories burned from steps
-const calculateCaloriesFromSteps = (steps) => {
-    const caloriesPerStep = 0.04; // Average calories burned per step
-    return steps * caloriesPerStep;
-};
-
-// Function to convert water intake to liters
-const convertWaterToLiters = (amount, unit) => {
-    switch (unit) {
-        case "cups":
-            return amount * 0.24; // 1 cup = 0.24 liters
-        case "gallons":
-            return amount * 3.785; // 1 gallon = 3.785 liters
-        case "liters":
-        default:
-            return amount;
+// Initialize Settings
+let userSettings = {
+    unitSystem: 'imperial',
+    goals: {
+        steps: 10000,
+        calories: 2000,
+        water: 8
     }
 };
 
-// Function to load and display saved health data
-const loadHealthData = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const userDocRef = doc(db, "users", user.uid); // Use UID as document ID
-    const userSnap = await getDoc(userDocRef);
-
-    if (userSnap.exists()) {
-        const data = userSnap.data();
-        
-        // Check if the data is from today
-        const lastUpdateDate = new Date(data.date);
-        const today = new Date();
-        if (lastUpdateDate.toDateString() !== today.toDateString()) {
-            // If the data is not from today, reset the values
-            await setDoc(userDocRef, {
-                steps: 0,
-                caloriesBurned: 0,
-                waterIntake: 0,
-                date: today.toISOString()
-            }, { merge: true });
-
-            stepsDisplay.textContent = `🚶 0`;
-            caloriesDisplay.textContent = `🔥 0 kcal`;
-            waterDisplay.textContent = `💧 0L`;
-        } else {
-            // Display the stored values (use default 0 if missing)
-            stepsDisplay.textContent = `🚶 ${data.steps || 0}`;
-            caloriesDisplay.textContent = `🔥 ${data.caloriesBurned || 0} kcal`;
-            waterDisplay.textContent = `💧 ${data.waterIntake || 0}L`;
-        }
-
-        // Save the current state for undo functionality
-        previousState = { ...data };
-    }
-
-    // Load and display historical data
-    loadHistoricalData(user.uid);
+// Sample data - in a real app, this would come from a database or API
+const userData = {
+    steps: 7500,
+    stepGoal: 10000,
+    distance: 3.2, // miles
+    activeMinutes: 45,
+    caloriesConsumed: 1850,
+    calorieGoal: 2000,
+    protein: 120,
+    carbs: 210,
+    fat: 65,
+    currentWeight: 165.4,
+    weightHistory: [168, 167.2, 166.5, 166, 165.8, 165.5, 165.4],
+    sleepDuration: 7.5,
+    sleepQuality: 85,
+    totalCaloriesBurned: 520,
+    exerciseCalories: 320,
+    waterGlasses: 5,
+    weeklyActivity: [7500, 8200, 6000, 9100, 10500, 7800, 6500] // steps for each day of the week
 };
 
-// Function to load and display historical data
-const loadHistoricalData = async (uid) => {
-    const historyQuery = query(collection(db, `users/${uid}/history`));
-    const querySnapshot = await getDocs(historyQuery);
-
-    historyList.innerHTML = ""; // Clear existing history
-
-    querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const date = new Date(data.date).toDateString();
-
-        // Skip today's data
-        if (date === new Date().toDateString()) return;
-
-        const historyItem = document.createElement("div");
-        historyItem.classList.add("history-item");
-        historyItem.innerHTML = `
-            <h3>${date}</h3>
-            <p>Steps: 🚶 ${data.steps || 0}</p>
-            <p>Calories Burned: 🔥 ${data.caloriesBurned || 0} kcal</p>
-            <p>Water Intake: 💧 ${data.waterIntake || 0}L</p>
-        `;
-        historyList.appendChild(historyItem);
+document.addEventListener('DOMContentLoaded', function() {
+    // Set current date
+    const currentDate = new Date();
+    document.getElementById('current-date').textContent = currentDate.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
     });
-};
 
-// Function to save and update cumulative health data
-const saveHealthData = async () => {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("User not authenticated. Please log in.");
-        return;
-    }
+    // Update metrics with user data
+    updateMetrics(userData);
 
-    const userDocRef = doc(db, "users", user.uid); // Use UID as document ID
+    // Initialize charts
+    initializeCharts(userData);
 
-    try {
-        // Retrieve current data first
-        const userSnap = await getDoc(userDocRef);
-        let currentData = userSnap.exists() ? userSnap.data() : {};
+    // Water intake functionality
+    setupWaterIntake(userData.waterGlasses);
 
-        // Parse existing values, default to 0 if missing
-        let previousSteps = parseInt(currentData.steps) || 0;
-        let previousCalories = parseInt(currentData.caloriesBurned) || 0;
-        let previousWater = parseFloat(currentData.waterIntake) || 0;
+    // Weight modal functionality
+    setupWeightModal();
 
-        // Get new values from input fields
-        let newSteps = parseInt(stepsInput.value) || 0;
-        let newWaterAmount = parseFloat(waterAmountInput.value) || 0;
+    // Settings modal functionality
+    setupSettingsModal();
 
-        // Validate inputs to ensure no negative values
-        if (newSteps < 0 || newWaterAmount < 0) {
-            alert("Steps and water intake cannot be negative.");
-            return;
+    // Quick action buttons (placeholder functionality)
+    document.querySelectorAll('.action-btn').forEach((btn, index) => {
+        if (index === 0) { // Log Meal button
+            btn.addEventListener('click', function() {
+                window.location.href = 'FoodLog.html';
+            });
+        } 
+        else if (index === 1) { // Start Workout button
+            btn.addEventListener('click', function() {
+                window.location.href = 'exercise-logging.html';
+            });
         }
+        else if (index === 2) { // Log Sleep button (keep placeholder)
+            btn.addEventListener('click', function() {
+                alert('Log Sleep functionality would be implemented here.');
+            });
+        }
+        // Settings button (index 3) is already handled by setupSettingsModal()
+    });
+});
 
-        let newCalories = calculateCaloriesFromSteps(newSteps);
-        let newWaterUnit = waterUnitSelect.value;
-        let newWater = convertWaterToLiters(newWaterAmount, newWaterUnit);
+function updateMetrics(data) {
+    // Convert weight if needed
+    const weightValue = userSettings.unitSystem === 'metric' ? 
+        (data.currentWeight * 0.453592).toFixed(1) : 
+        data.currentWeight.toFixed(1);
+    const weightUnit = userSettings.unitSystem === 'metric' ? 'kg' : 'lbs';
+    
+    // Convert distance if needed
+    const distanceValue = userSettings.unitSystem === 'metric' ? 
+        (data.distance * 1.60934).toFixed(1) : 
+        data.distance.toFixed(1);
+    const distanceUnit = userSettings.unitSystem === 'metric' ? 'km' : 'miles';
 
-        // Add new values to the existing totals
-        let updatedSteps = previousSteps + newSteps;
-        let updatedCalories = previousCalories + newCalories;
-        let updatedWater = previousWater + newWater;
+    // Steps and activity
+    const stepsPercent = (data.steps / userSettings.goals.steps) * 100;
+    document.getElementById('steps-progress').style.width = `${Math.min(stepsPercent, 100)}%`;
+    document.getElementById('steps-text').textContent = 
+        `${data.steps.toLocaleString()}/${userSettings.goals.steps.toLocaleString()}`;
+    document.getElementById('distance').textContent = distanceValue;
+    document.getElementById('distance').nextElementSibling.textContent = distanceUnit;
+    document.getElementById('active-time').textContent = data.activeMinutes;
 
-        // Save the current state for undo functionality
-        previousState = { steps: previousSteps, caloriesBurned: previousCalories, waterIntake: previousWater };
+    // Nutrition
+    const caloriesPercent = (data.caloriesConsumed / userSettings.goals.calories) * 100;
+    document.getElementById('calories-progress').style.width = `${Math.min(caloriesPercent, 100)}%`;
+    document.getElementById('calories-text').textContent = 
+        `${data.caloriesConsumed}/${userSettings.goals.calories}`;
+    document.getElementById('protein').textContent = data.protein;
+    document.getElementById('carbs').textContent = data.carbs;
+    document.getElementById('fat').textContent = data.fat;
 
-        // Update Firestore with new cumulative data
-        await setDoc(userDocRef, {
-            steps: updatedSteps,
-            caloriesBurned: updatedCalories,
-            waterIntake: updatedWater,
-            date: new Date().toISOString()
-        }, { merge: true });
+    // Weight
+    document.getElementById('current-weight').textContent = weightValue;
+    document.querySelector('.weight-unit').textContent = weightUnit;
+    if (data.weightHistory.length > 1) {
+        const weightChange = data.currentWeight - data.weightHistory[data.weightHistory.length - 2];
+        const changeElement = document.getElementById('weight-change-amount');
+        const directionElement = document.getElementById('weight-change-direction');
+        
+        changeElement.textContent = Math.abs(weightChange).toFixed(1);
+        
+        if (weightChange > 0) {
+            directionElement.innerHTML = '<i class="fas fa-arrow-up" style="color: var(--danger-color)"></i>';
+        } else if (weightChange < 0) {
+            directionElement.innerHTML = '<i class="fas fa-arrow-down" style="color: var(--success-color)"></i>';
+        } else {
+            directionElement.innerHTML = '<i class="fas fa-equals" style="color: var(--info-color)"></i>';
+        }
+    }
 
-        // Save historical data
-        const historyDocRef = doc(collection(db, `users/${user.uid}/history`), new Date().toISOString());
-        await setDoc(historyDocRef, {
-            steps: updatedSteps,
-            caloriesBurned: updatedCalories,
-            waterIntake: updatedWater,
-            date: new Date().toISOString()
+    // Sleep
+    document.getElementById('sleep-duration').textContent = data.sleepDuration.toFixed(1);
+    document.getElementById('sleep-quality').textContent = `${data.sleepQuality}%`;
+    document.getElementById('sleep-score').textContent = Math.round(data.sleepQuality);
+    document.querySelector('.circular-progress').style.background = 
+        `conic-gradient(var(--accent-color) ${data.sleepQuality}%, #e9ecef ${data.sleepQuality}%)`;
+
+    // Calories burned
+    document.getElementById('total-burned').textContent = data.totalCaloriesBurned;
+    document.getElementById('exercise-burned').textContent = data.exerciseCalories;
+}
+
+function initializeCharts(data) {
+    // Weight history chart
+    const weightCtx = document.getElementById('weight-chart').getContext('2d');
+    const weightChart = new Chart(weightCtx, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: data.weightHistory.length}, (_, i) => `${i + 1} day${i > 0 ? 's' : ''} ago`).reverse(),
+            datasets: [{
+                label: 'Weight (lbs)',
+                data: data.weightHistory,
+                borderColor: '#00bcd4',
+                backgroundColor: 'rgba(0, 188, 212, 0.1)',
+                tension: 0.3,
+                fill: true,
+                pointBackgroundColor: '#00bcd4',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#ffffff'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    titleColor: '#00bcd4',
+                    bodyColor: '#ffffff',
+                    callbacks: {
+                        label: function(context) {
+                            return `Weight: ${context.parsed.y} lbs`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Weight (lbs)',
+                        color: '#ffffff'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#ffffff'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#ffffff'
+                    }
+                }
+            }
+        }
+    });
+
+    // Weekly activity chart
+    const activityCtx = document.getElementById('activity-chart').getContext('2d');
+    const activityChart = new Chart(activityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            datasets: [{
+                label: 'Steps',
+                data: data.weeklyActivity,
+                backgroundColor: 'rgba(0, 188, 212, 0.7)',
+                borderColor: 'rgba(0, 188, 212, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#ffffff'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    titleColor: '#00bcd4',
+                    bodyColor: '#ffffff',
+                    callbacks: {
+                        label: function(context) {
+                            return `Steps: ${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Steps',
+                        color: '#ffffff'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#ffffff'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#ffffff'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function setupWaterIntake(initialGlasses) {
+    const glasses = document.querySelectorAll('.glass');
+    const waterText = document.getElementById('water-text');
+    const addWaterBtn = document.getElementById('add-water-btn');
+    
+    let currentGlasses = initialGlasses;
+    
+    // Initialize glasses
+    updateWaterDisplay();
+    
+    // Add water button functionality
+    addWaterBtn.addEventListener('click', function() {
+        if (currentGlasses < userSettings.goals.water) {
+            currentGlasses++;
+            updateWaterDisplay();
+        } else {
+            alert("You've reached your daily water goal!");
+        }
+    });
+    
+    // Click on individual glasses
+    glasses.forEach((glass, index) => {
+        glass.addEventListener('click', function() {
+            currentGlasses = index + 1;
+            updateWaterDisplay();
         });
-
-        alert("Data updated successfully!");
-
-        // Update the displayed values
-        stepsDisplay.textContent = `🚶 ${updatedSteps}`;
-        caloriesDisplay.textContent = `🔥 ${updatedCalories.toFixed(2)} kcal`;
-        waterDisplay.textContent = `💧 ${updatedWater.toFixed(2)}L`;
-
-        // Show the undo button
-        undoButton.style.display = "inline-block";
-
-        // Clear input fields after saving
-        stepsInput.value = "";
-        waterAmountInput.value = "";
-        waterUnitSelect.value = "liters";
-
-    } catch (error) {
-        console.error("Error saving data: ", error);
-        alert("Failed to save data.");
+    });
+    
+    function updateWaterDisplay() {
+        // Only show the number of glasses needed for the goal
+        glasses.forEach((glass, index) => {
+            if (index < userSettings.goals.water) {
+                glass.style.display = 'block';
+                glass.dataset.filled = index < currentGlasses;
+            } else {
+                glass.style.display = 'none';
+            }
+        });
+        waterText.textContent = `${currentGlasses}/${userSettings.goals.water} glasses`;
     }
-};
+}
 
-// Function to undo the last entry
-const undoLastEntry = async () => {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("User not authenticated. Please log in.");
-        return;
-    }
+function setupWeightModal() {
+    const modal = document.getElementById('weight-modal');
+    const logBtn = document.getElementById('log-weight-btn');
+    const closeBtn = document.querySelector('.close-btn');
+    const submitBtn = document.getElementById('submit-weight-btn');
+    const weightInput = document.getElementById('weight-input');
+    
+    logBtn.addEventListener('click', function() {
+        modal.style.display = 'flex';
+    });
+    
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+    
+    submitBtn.addEventListener('click', function() {
+        const newWeight = parseFloat(weightInput.value);
+        if (!isNaN(newWeight)) {
+            // Update the user data
+            userData.currentWeight = newWeight;
+            userData.weightHistory.unshift(newWeight); // Add to beginning of array
+            
+            // Update the display
+            updateMetrics(userData);
+            
+            // Close modal and reset
+            modal.style.display = 'none';
+            weightInput.value = '';
+            
+            // In a real app, you would save this to your database
+            alert(`Weight logged: ${newWeight} ${userSettings.unitSystem === 'metric' ? 'kg' : 'lbs'}`);
+        } else {
+            alert('Please enter a valid weight');
+        }
+    });
+}
 
-    const userDocRef = doc(db, "users", user.uid); // Use UID as document ID
+function setupSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    const settingsBtn = document.querySelector('.action-btn:nth-child(4)'); // Settings button
+    const closeBtn = modal.querySelector('.close-btn');
+    const saveBtn = document.getElementById('save-settings-btn');
 
-    try {
-        // Restore the previous state
-        await setDoc(userDocRef, previousState, { merge: true });
+    // Initialize form with current settings
+    document.querySelector(`input[name="unit-system"][value="${userSettings.unitSystem}"]`).checked = true;
+    document.getElementById('step-goal').value = userSettings.goals.steps;
+    document.getElementById('calorie-goal').value = userSettings.goals.calories;
+    document.getElementById('water-goal').value = userSettings.goals.water;
 
-        // Update the displayed values
-        stepsDisplay.textContent = `🚶 ${previousState.steps || 0}`;
-        caloriesDisplay.textContent = `🔥 ${previousState.caloriesBurned.toFixed(2) || 0} kcal`;
-        waterDisplay.textContent = `💧 ${previousState.waterIntake.toFixed(2) || 0}L`;
+    // Open settings modal
+    settingsBtn.addEventListener('click', function() {
+        modal.style.display = 'flex';
+    });
+    
+    // Close settings modal
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    // Save settings
+    saveBtn.addEventListener('click', function() {
+        // Update settings
+        userSettings.unitSystem = document.querySelector('input[name="unit-system"]:checked').value;
+        userSettings.goals.steps = parseInt(document.getElementById('step-goal').value) || 10000;
+        userSettings.goals.calories = parseInt(document.getElementById('calorie-goal').value) || 2000;
+        userSettings.goals.water = parseInt(document.getElementById('water-goal').value) || 8;
+        
+        // Update UI with new settings
+        updateMetrics(userData);
+        setupWaterIntake(userData.waterGlasses);
 
-        // Hide the undo button
-        undoButton.style.display = "none";
-
-    } catch (error) {
-        console.error("Error undoing last entry: ", error);
-        alert("Failed to undo last entry.");
-    }
-};
-
-// Monitor authentication state
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        loadHealthData();
-    } else {
-        window.location.href = "sign-in.html"; // Redirect to login if not authenticated
-    }
-});
-
-// Attach event listeners to buttons
-saveButton.addEventListener("click", () => {
-    console.log("Save button clicked"); // Debug log
-    saveHealthData();
-});
-undoButton.addEventListener("click", () => {
-    console.log("Undo button clicked"); // Debug log
-    undoLastEntry();
-});
+        // In a real app, you would save these settings to your database
+        alert('Settings saved!');
+        modal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
