@@ -8,6 +8,8 @@ body {
   min-height: 100vh;
   padding: 0;
   box-sizing: border-box;
+
+  padding-top: 70px;
 }
 
 .layout {
@@ -130,3 +132,25 @@ button:hover {
   font-size: 18px;
   margin-bottom: 10px;
 }
+
+
+.nav-links a,
+.dropdown button {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.dropdown button {
+  background: none;
+  border: none;
+  color: #E2E8F0;
+  font-weight: bold;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0;
+  line-height: 1;
+}
+
+

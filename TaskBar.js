@@ -1,70 +1,108 @@
 function createTaskbar() {
     const taskbarHTML = `
         <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                padding-top: 60px;
+                margin: 0;
+                overflow-x: hidden;
+            }
+
             .taskbar {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                background: rgba(15, 32, 39, 0.9);
-                padding: 10px 20px; /* Reduced padding for better fit */
-                color: white;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-                width: 100%; /* Ensures the taskbar spans the full width of the screen */
-                position: fixed; /* Makes the taskbar stick to the top of the page */
-                top: 0; /* Pushes the taskbar to the top */
-                left: 0; /* Ensures it starts from the left edge */
-                z-index: 1000; /* Keeps the taskbar above other elements */
-            }
-            .logo {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-            }
-            .logo img {
-                width: 50px;
-                height: 50px;
-                margin-right: 10px;
-            }
-            .logo span {
-                font-size: 20px;
-                color: #00bcd4;
-                font-weight: bold;
-            }
+                background-color: rgba(15, 32, 39, 0.9);
+                padding: 10px 40px;
+                color: #E2E8F0;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                width: 100%;
+                position: fixed;
+                top: 0;
             .nav-links {
                 display: flex;
-                gap: 20px; /* Adds spacing between links */
-                flex-wrap: wrap; /* Ensures links wrap to the next line if they exceed the width */
-                justify-content: flex-end; /* Aligns links to the right */
-                max-width: calc(100% - 100px); /* Prevents links from overflowing the taskbar */
-                overflow: hidden; /* Hides overflowing content */
+                gap: 25px;
+                align-items: center;
             }
+
             .nav-links a {
-                color: white;
+                color: #E2E8F0;
                 text-decoration: none;
-                font-weight: 500;
-                transition: text-decoration 0.3s ease;
+                font-weight: bold;
+                padding: 10px;
+                transition: background-color 0.3s ease;
+                border-radius: 5px;
+                font-size: 16px;
             }
+
             .nav-links a:hover {
-                text-decoration: underline;
+                background-color: #63B3ED;
             }
-            body {
-                margin: 0; /* Removes default margin to prevent gaps */
-                padding-top: 70px; /* Ensures content is not hidden behind the taskbar */
+
+            .dropdown {
+                position: relative;
+            }
+
+            .dropdown button {
+                background: none;
+                border: none;
+                color: #E2E8F0;
+                font-weight: bold;
+                padding: 10px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            .dropdown-menu {
+                display: none;
+                position: absolute;
+                background-color: #1A202C;
+                border-radius: 5px;
+                overflow: hidden;
+                top: 100%;
+                left: 0;
+                min-width: 150px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            }
+
+            .dropdown-menu a {
+                display: block;
+                padding: 10px;
+                color: #E2E8F0;
+                text-decoration: none;
+                font-size: 16px;
+            }
+
+            .dropdown-menu a:hover {
+                background-color: #2D3748;
+            }
+
+            .dropdown:hover .dropdown-menu {
+                display: block;
+            }
+
+            .sign-out {
+                color: #E53E3E;
             }
         </style>
         <div class="taskbar">
-            <!-- Logo Section -->
-            <div class="logo" onclick="location.href='index.html'">
-                <img src="360_transparent.png" alt="Thrive 360 Logo">
-                <span>Thrive360</span>
+            <div class="taskbar-left">
+                Thrive360
             </div>
             <div class="nav-links">
-                <a href="index.html">Dashboard</a>
-                <a href="FoodLog.html">Food Log</a>
-                <a href="exercise-logging.html">Exercise Log</a>
-                <a href="profile.html">Profile</a>
-                <a href="logs.html">Log History</a>
-                <a href="sign-in.html" onclick="event.preventDefault(); logout();">Sign Out</a>
+                <a href="dashboard.html">Dashboard</a>
+                <div class="dropdown">
+                    <button>Log History ▼</button>
+                    <div class="dropdown-menu">
+                        <a href="FoodLog.html">Food Log</a>
+                        <a href="exercise-logging.html">Exercise Log</a>
+                    </div>
+                </div>
+                <a href="Profile.html">Profile</a>
+                <a href="sign-in.html" class="sign-out">Sign Out</a>
             </div>
         </div>
     `;
@@ -72,3 +110,5 @@ function createTaskbar() {
 }
 
 createTaskbar();
+
+
