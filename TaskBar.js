@@ -128,7 +128,7 @@ function createTaskbar() {
                 Thrive360
             </div>
             <div class="nav-links">
-                <a href="dashboard.html">Dashboard</a>
+                <a href="index.html">Dashboard</a>
                 <div class="dropdown">
                     <button>Log▼</button>
                     <div class="dropdown-menu">
