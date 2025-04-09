@@ -33,16 +33,24 @@
           <!-- Hidden gender text input -->
           <input type="text" id="genderOther" placeholder="Please specify" style="display: none;" />
         
-          <!-- Height + Unit -->
+          <!-- Height Fields -->
           <div class="inline-group">
-            <input type="number" id="height" placeholder="Height" required />
+            <!-- Metric input -->
+            <input type="number" id="heightCm" placeholder="Height (cm)" />
+
+            <!-- Imperial inputs -->
+            <div id="heightImperial" class="inline-group" style="display: none;">
+              <input type="number" id="heightFt" placeholder="ft" />
+              <input type="number" id="heightIn" placeholder="in" />
+            </div>
+
+            <!-- Unit selector -->
             <select id="heightUnit" required>
-              <option value="ft">ft</option>
-              <option value="in">in</option>
               <option value="cm">cm</option>
-              <option value="m">m</option>
+              <option value="ft">ft/in</option>
             </select>
           </div>
+
         
           <!-- Weight + Unit -->
           <div class="inline-group">
