@@ -39,6 +39,10 @@ const editWeight = document.getElementById("editWeight");
 const weightUnit = document.getElementById("weightUnit");
 const editGender = document.getElementById("editGender");
 
+const pronounsDisplay = document.getElementById("pronounsDisplay");
+const editPronouns = document.getElementById("editPronouns");
+const customPronounsInput = document.getElementById("customPronouns");
+
 let originalData = {}; // Stores snapshot for cancel
 
 function getHealthStatus(bmi) {
@@ -57,6 +61,10 @@ editBio.addEventListener("input", () => {
   bioCharCount.textContent = `${editBio.value.length}/200`;
 });
 
+editPronouns.addEventListener("change", () => {
+  customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
+});
+
 function updateDOM(data, user) {
   originalData = structuredClone(data);
 
@@ -68,6 +76,13 @@ function updateDOM(data, user) {
   weight.textContent = data.weight ?? "—";
   gender.textContent = data.gender ?? "—";
   bmi.textContent = data.bmi ?? "—";
+
+  const pronouns = data.pronouns || "";
+  pronounsDisplay.textContent = pronouns ? `(${pronouns})` : "";
+
+  editPronouns.value = ["He/Him", "She/Her", "They/Them", "Any Pronouns"].includes(pronouns) ? pronouns : "Custom";
+  customPronounsInput.value = editPronouns.value === "Custom" ? pronouns : "";
+  customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
 
   const status = getHealthStatus(data.bmi);
   bmiStatusEl.textContent = status.label;
@@ -156,6 +171,10 @@ saveProfileButton.addEventListener("click", async () => {
     return;
   }
 
+  let pronounsVal = editPronouns.value === "Custom"
+    ? customPronounsInput.value.trim()
+    : editPronouns.value;
+
   const docRef = doc(db, "profile", user.uid);
   const currentSnap = await getDoc(docRef);
   const currentData = currentSnap.exists() ? currentSnap.data() : {};
@@ -167,7 +186,8 @@ saveProfileButton.addEventListener("click", async () => {
     age: ageVal,
     height: `${heightVal} ${heightUnit.value}`,
     weight: `${weightVal} ${weightUnit.value}`,
-    gender: editGender.value.trim()
+    gender: editGender.value.trim(),
+    pronouns: pronounsVal
   };
 
   let heightMeters = heightVal;
@@ -198,6 +218,13 @@ cancelEditButton.addEventListener("click", () => {
   weightUnit.value = originalData.weight?.split(" ")[1] || "kg";
   editGender.value = originalData.gender || "";
 
+  const originalPronouns = originalData.pronouns || "";
+  editPronouns.value = ["He/Him", "She/Her", "They/Them", "Any Pronouns"].includes(originalPronouns)
+    ? originalPronouns
+    : "Custom";
+  customPronounsInput.value = editPronouns.value === "Custom" ? originalPronouns : "";
+  customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
+
   toggleEdit(false);
 });
 
@@ -212,12 +239,15 @@ function toggleEdit(isEditing) {
   togglePair(height, editHeight);
   togglePair(weight, editWeight);
   togglePair(gender, editGender);
+  togglePair(pronounsDisplay, editPronouns);
 
   heightUnit.parentElement.classList.toggle("show", isEditing);
   weightUnit.parentElement.classList.toggle("show", isEditing);
+  customPronounsInput.style.display = isEditing && editPronouns.value === "Custom" ? "block" : "none";
 
   editProfileButton.style.display = isEditing ? "none" : "inline-block";
   saveProfileButton.style.display = isEditing ? "inline-block" : "none";
   cancelEditButton.style.display = isEditing ? "inline-block" : "none";
 }
+
 
