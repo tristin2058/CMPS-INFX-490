@@ -22,18 +22,6 @@ function createTaskbar() {
                 width: 100%;
                 position: fixed;
                 top: 0;
-                left: 0; /* Make sure this is 0 */
-                z-index: 1000;
-            }
-
-            .taskbar-left {
-                font-size: 24px;
-                font-weight: bold;
-                color: #00BFFF;
-                font-family: "Segoe UI", sans-serif;
-                margin-left: 10px;
-            }
-
             .nav-links {
                 display: flex;
                 gap: 25px;
