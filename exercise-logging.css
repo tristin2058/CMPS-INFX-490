@@ -1,19 +1,20 @@
-/* General Reset */
+/* Exercise Logging - Dark Theme to Match App */
+
 body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: white;
     display: flex;
     height: 100vh;
+    overflow: hidden;
 }
 
-/* Layout */
 .layout {
     display: flex;
     width: 100%;
 }
 
-/* Main Content */
 .main-content {
     flex: 1;
     padding: 30px;
@@ -25,6 +26,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    color: #64d9ff;
 }
 
 .profile-btn {
@@ -32,156 +34,196 @@ body {
     border: none;
     background: none;
     cursor: pointer;
-    color: #007BFF;
+    color: #64d9ff;
 }
 
 .profile-btn:hover {
-    color: #0056b3;
+    color: #3cc8f2;
 }
 
-/* Exercise Sections Container */
 .exercise-sections {
     display: flex;
     gap: 20px;
     margin: 30px 0;
+    flex-wrap: wrap;
 }
 
-/* Log Your Exercise Section */
-.log-exercise {
-    flex: 1;
-}
-
-/* Exercise Lookup Section */
+.log-exercise,
 .exercise-lookup {
     flex: 1;
+    min-width: 300px;
 }
 
-/* Exercise Card */
 .exercise-card {
-    background: linear-gradient(135deg, #f9f9fc, #eef3f8);
-    padding: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     text-align: center;
-    max-width: 500px;
-    margin: 0 auto;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
 }
 
 .exercise-card h2 {
     font-size: 24px;
-    color: #333;
+    color: #64d9ff;
     margin-bottom: 20px;
 }
 
 .exercise-inputs {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 50px;
-    justify-content: center; /* Center the inputs horizontally */
+    gap: 30px;
     margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .input-box {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.1);
     padding: 15px;
-    border: 1px solid #ddd;
     border-radius: 10px;
-    text-align: left;
+    position: relative;
+    transition: transform 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-box:hover {
+    transform: scale(1.02);
 }
 
 .input-box label {
-    width: 60%;
     display: block;
     font-size: 14px;
-    color: black; /* Changed text color to black */
-    background: #007BFF;
-    padding: 5px;
-    border-radius: 5px;
+    color: #64d9ff;
     margin-bottom: 5px;
 }
 
-.input-box input {
-    width: 90%;
+.input-box input,
+.input-box select {
+    width: 100%;
     padding: 10px;
     font-size: 14px;
-    border: 1px solid #ccc;
+    border: none;
     border-radius: 5px;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.input-box input:focus {
-    outline: none;
-    border-color: #007BFF;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-/* Save Button */
-.btn-save-exercise {
-    background: #007BFF;
+    background: rgba(255, 255, 255, 0.08);
     color: white;
-    font-size: 16px;
-    padding: 12px 20px;
+    backdrop-filter: blur(6px);
+    box-sizing: border-box;
+}
+
+.input-box input::placeholder,
+.input-box select::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.input-box input:focus,
+.input-box select:focus {
+    outline: none;
+    border: 1px solid #64d9ff;
+    box-shadow: 0 0 8px rgba(100, 217, 255, 0.6);
+}
+
+#exerciseOutput {
+    max-height: 250px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.exercise-item {
+    text-align: left;
+    line-height: 1.5;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.suggestions {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #64d9ff;
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    display: none;
+    z-index: 10;
+    color: white;
+    font-size: 14px;
+    backdrop-filter: blur(6px);
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+    background: #64d9ff;
+    color: #0f2027;
+}
+
+button {
+    background-color: #64d9ff;
+    color: #0f2027;
     border: none;
     border-radius: 10px;
+    padding: 12px 20px;
     cursor: pointer;
+    font-weight: bold;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    margin: 10px 5px;
 }
 
-.btn-save-exercise:hover {
-    background: #0056b3;
+button:hover {
+    background-color: #3cc8f2;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Undo Button */
 .btn-undo-exercise {
-    background: #ff4d4d;
+    background-color: #ff4d4d;
     color: white;
-    font-size: 16px;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    display: none; /* Initially hidden */
+    display: none;
 }
 
 .btn-undo-exercise:hover {
-    background: #d32f2f;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    background-color: #d32f2f;
 }
 
-/* Overview Section */
 .metrics {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
 }
 
 .metric-card {
     flex: 1;
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
     padding: 20px;
-    text-align: center;
     border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    color: white;
 }
 
-/* Exercise List */
 #exerciseList {
     margin-top: 20px;
 }
 
-.exercise-item {
-    background: #fff;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Profile Modal */
 .modal {
     position: fixed;
     top: 0;
@@ -203,61 +245,27 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: rgba(255, 255, 255, 0.1);
     padding: 20px;
     border-radius: 10px;
-    text-align: center;
     width: 300px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .modal-content button {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 .modal-content .btn-danger {
-    background: #ff4d4d;
-    color: white;
+    background-color: #ff4d4d;
 }
 
 .modal-content .btn-secondary {
-    background: #f4f4f9;
-    color: #333;
-    border: 1px solid #ddd;
-}
-
-/* Ensure the input-box is relative for positioning */
-.input-box {
-    position: relative;
-}
-
-/* Styling for the dropdown suggestions */
-.suggestions {
-    position: absolute;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    max-height: 150px;
-    overflow-y: auto;
-    width: calc(100% - 20px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: none;
-    z-index: 10;
-}
-
-/* Individual suggestion items */
-.suggestion-item {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-/* Hover effect for better UX */
-.suggestion-item:hover {
-    background: #007BFF;
+    background-color: rgba(255, 255, 255, 0.05);
     color: white;
+    border: 1px solid #64d9ff;
 }

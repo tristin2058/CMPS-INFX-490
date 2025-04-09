@@ -8,6 +8,8 @@ body {
   min-height: 100vh;
   padding: 0;
   box-sizing: border-box;
+
+  padding-top: 70px;
 }
 
 .layout {
@@ -130,20 +132,25 @@ button:hover {
   font-size: 18px;
   margin-bottom: 10px;
 }
-.logo-btn {
-  position: absolute;
-  top: 0px; /* Adjust height */
-  left: 0px;
+
+
+.nav-links a,
+.dropdown button {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.dropdown button {
   background: none;
   border: none;
+  color: #E2E8F0;
+  font-weight: bold;
+  padding: 10px;
   cursor: pointer;
-  padding: 0;
-  display: block;
-  z-index: 100; /* Ensures button is visible */
-  /* Ensures it appears above other elements */
+  font-size: 16px;
+  margin: 0;
+  line-height: 1;
 }
-.logo-btn img {
-  width: 70px; /* Slightly larger */
-  height: 70px;
-  display: block; /* Ensures image renders */
-}
+
+
