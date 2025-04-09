@@ -24,12 +24,16 @@
         <img id="profileImage" src="place-holder-image.jpg" alt="Profile Picture" />
         <input type="file" id="profileImageInput" />
       </div>
-      <div>
-        <h2 id="displayName">Display Name</h2>
-        <p id="username">@username</p>
-        <div>
-          <p id="bio">User bio goes here</p>
-          <textarea id="editBio" style="display: none;"></textarea>
+      <div class="profile-text">
+        <h2 id="displayName"></h2>
+        <p id="username"></p>
+
+        <div class="fade-toggle show">
+          <p id="bio"></p>
+        </div>
+        <div class="fade-toggle">
+          <textarea id="editBio"></textarea>
+          <small id="bioCharCount">0/200</small>
         </div>
       </div>
     </section>
@@ -38,33 +42,57 @@
     <section class="stats-section">
       <div class="stat-card">
         <h3>Age</h3>
-        <p id="age"></p>
-        <input id="editAge" type="number" style="display: none;" />
+        <div class="fade-toggle show">
+          <p id="age"></p>
+        </div>
+        <div class="fade-toggle">
+          <input id="editAge" type="number" />
+        </div>
       </div>
+
       <div class="stat-card">
         <h3>Height</h3>
-        <p id="height"></p>
-        <input id="editHeight" type="text" style="display: none;" />
-        <select id="heightUnit" style="display: none;">
-          <option value="cm">cm</option>
-          <option value="in">in</option>
-          <option value="ft">ft</option>
-        </select>
+        <div class="fade-toggle show">
+          <p id="height"></p>
+        </div>
+        <div class="fade-toggle">
+          <input id="editHeight" type="number" />
+          <select id="heightUnit">
+            <option value="cm">cm</option>
+            <option value="in">in</option>
+            <option value="ft">ft</option>
+          </select>
+        </div>
       </div>
+
       <div class="stat-card">
         <h3>Weight</h3>
-        <p id="weight"></p>
-        <input id="editWeight" type="number" style="display: none;" />
-        <select id="weightUnit" style="display: none;">
-          <option value="kg">kg</option>
-          <option value="lb">lb</option>
-        </select>
+        <div class="fade-toggle show">
+          <p id="weight"></p>
+        </div>
+        <div class="fade-toggle">
+          <input id="editWeight" type="number" />
+          <select id="weightUnit">
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+          </select>
+        </div>
       </div>
+
       <div class="stat-card">
         <h3>Gender</h3>
-        <p id="gender"></p>
-        <input id="editGender" type="text" style="display: none;" />
+        <div class="fade-toggle show">
+          <p id="gender"></p>
+        </div>
+        <div class="fade-toggle">
+          <select id="editGender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
       </div>
+
       <div class="stat-card">
         <h3>BMI</h3>
         <p><span id="bmi"></span> <span id="bmiStatus"></span></p>
@@ -80,7 +108,7 @@
     </section>
 
     <!-- Action Buttons -->
-    <section>
+    <section class="button-container">
       <button id="editProfileButton">Edit Profile</button>
       <button id="saveProfileButton" style="display: none;">Save Changes</button>
       <button id="cancelEditButton" style="display: none;">Cancel</button>

@@ -51,9 +51,11 @@ main {
 .profile-header {
   display: flex;
   gap: 40px;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  flex-wrap: nowrap; /* force content to stay in one row */
+  width: 100%;
 }
+
 
 .profile-header img {
   width: 140px;
@@ -129,3 +131,72 @@ button {
 button:hover {
   background-color: #019bb0;
 }
+
+.bio-container {
+  max-width: 100%;
+  width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.profile-text {
+  max-width: 600px; /* or 50% depending on design */
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.bio-container {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+#bio {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+.fade-toggle {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.fade-toggle.show {
+  max-height: 1000px; /* large enough to fit bio and counter */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+
+.fade-toggle textarea,
+.fade-toggle small {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.fade-toggle:not(.show) textarea,
+.fade-toggle:not(.show) small {
+  opacity: 0;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  background: #2b3d4f;
+  color: white;
+  border: 1px solid #556;
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+
+
+
+
