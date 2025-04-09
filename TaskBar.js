@@ -1,25 +1,45 @@
 function createTaskbar() {
     const taskbarHTML = `
         <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                padding-top: 60px;
+                margin: 0;
+                overflow-x: hidden;
+            }
+
             .taskbar {
                 display: flex;
-                justify-content: flex-end;
+                justify-content: space-between;
                 align-items: center;
-                background-color: rgba(15, 32, 39, 0.9); /* Updated background color */
-                padding: 15px 50px; /* Increased right padding */
+                background-color: rgba(15, 32, 39, 0.9);
+                padding: 10px 40px;
                 color: #E2E8F0;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
                 width: 100%;
                 position: fixed;
                 top: 0;
-                left: -65px; /* Shifted taskbar to the left by 100px */
+                left: 0; /* Make sure this is 0 */
                 z-index: 1000;
             }
+
+            .taskbar-left {
+                font-size: 24px;
+                font-weight: bold;
+                color: #00BFFF;
+                font-family: "Segoe UI", sans-serif;
+                margin-left: 10px;
+            }
+
             .nav-links {
                 display: flex;
-                gap: 40px;
+                gap: 25px;
                 align-items: center;
             }
+
             .nav-links a {
                 color: #E2E8F0;
                 text-decoration: none;
@@ -29,12 +49,15 @@ function createTaskbar() {
                 border-radius: 5px;
                 font-size: 16px;
             }
+
             .nav-links a:hover {
                 background-color: #63B3ED;
             }
+
             .dropdown {
                 position: relative;
             }
+
             .dropdown button {
                 background: none;
                 border: none;
@@ -44,6 +67,7 @@ function createTaskbar() {
                 cursor: pointer;
                 font-size: 16px;
             }
+
             .dropdown-menu {
                 display: none;
                 position: absolute;
@@ -55,6 +79,7 @@ function createTaskbar() {
                 min-width: 150px;
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             }
+
             .dropdown-menu a {
                 display: block;
                 padding: 10px;
@@ -62,20 +87,23 @@ function createTaskbar() {
                 text-decoration: none;
                 font-size: 16px;
             }
+
             .dropdown-menu a:hover {
                 background-color: #2D3748;
             }
+
             .dropdown:hover .dropdown-menu {
                 display: block;
             }
+
             .sign-out {
                 color: #E53E3E;
             }
-            body {
-                padding-top: 70px;
-            }
         </style>
         <div class="taskbar">
+            <div class="taskbar-left">
+                Thrive360
+            </div>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <div class="dropdown">
@@ -94,3 +122,5 @@ function createTaskbar() {
 }
 
 createTaskbar();
+
+
