@@ -89,6 +89,7 @@ function updateDOM(data, user) {
   username.textContent = data.username ? `@${data.username}` : "@—";
   bio.textContent = data.bio || "—";
   age.textContent = data.age ?? "—";
+  editAge.value = data.age ?? "";
   height.textContent = data.height ?? "—";
   weight.textContent = data.weight ?? "—";
   gender.textContent = data.gender ?? "—";
@@ -131,6 +132,17 @@ function updateDOM(data, user) {
 
   editWeight.value = data.weight?.split(" ")[0] || "";
   weightUnit.value = data.weight?.split(" ")[1] || "kg";
+
+  if (data.registeredAt?.seconds) {
+    const registeredDate = new Date(data.registeredAt.seconds * 1000);
+    registeredAtEl.textContent = registeredDate.toLocaleDateString();
+  }
+  
+  if (user?.metadata?.lastSignInTime) {
+    const lastLoginDate = new Date(user.metadata.lastSignInTime);
+    lastLoginEl.textContent = lastLoginDate.toLocaleDateString();
+  }
+  
 }
 
 onAuthStateChanged(auth, async (user) => {
