@@ -267,5 +267,24 @@ button:hover {
 .modal-content .btn-secondary {
     background-color: rgba(255, 255, 255, 0.05);
     color: white;
-    border: 1px solid #64d9ff;
+
 }
+.logo-btn {
+    position: absolute;
+    top: 0px; /* Adjust height */
+    left: 0px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: block;
+    z-index: 100; /* Ensures button is visible */
+    /* Ensures it appears above other elements */
+}
+.logo-btn img {
+    width: 70px; /* Slightly larger */
+    height: 70px;
+    display: block; /* Ensures image renders */
+}
+
+    border: 1px solid #64d9ff;

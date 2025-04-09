@@ -22,6 +22,11 @@ function createTaskbar() {
                 width: 100%;
                 position: fixed;
                 top: 0;
+
+                left: 0;
+                z-index: 50;
+            }
+
             .nav-links {
                 display: flex;
                 gap: 25px;
