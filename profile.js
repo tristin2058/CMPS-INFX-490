@@ -1,4 +1,6 @@
-// Finalized profile.js with animated edit toggle and fixes
+// Finalized profile.js with height field improvements + pronouns support
+// FIXED: Full rewrite with proper toggle handling for edit mode
+
 import { auth, db } from "./firebase-config.js";
 import {
   onAuthStateChanged,
@@ -33,17 +35,21 @@ const cancelEditButton = document.getElementById("cancelEditButton");
 const editBio = document.getElementById("editBio");
 const bioCharCount = document.getElementById("bioCharCount");
 const editAge = document.getElementById("editAge");
-const editHeight = document.getElementById("editHeight");
-const heightUnit = document.getElementById("heightUnit");
 const editWeight = document.getElementById("editWeight");
 const weightUnit = document.getElementById("weightUnit");
 const editGender = document.getElementById("editGender");
+
+const editHeightCm = document.getElementById("editHeightCm");
+const editHeightFt = document.getElementById("editHeightFt");
+const editHeightIn = document.getElementById("editHeightIn");
+const heightUnit = document.getElementById("heightUnit");
+const imperialHeightFields = document.getElementById("editHeightImperial");
 
 const pronounsDisplay = document.getElementById("pronounsDisplay");
 const editPronouns = document.getElementById("editPronouns");
 const customPronounsInput = document.getElementById("customPronouns");
 
-let originalData = {}; // Stores snapshot for cancel
+let originalData = {};
 
 function getHealthStatus(bmi) {
   const value = parseFloat(bmi);
@@ -65,6 +71,16 @@ editPronouns.addEventListener("change", () => {
   customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
 });
 
+heightUnit.addEventListener("change", () => {
+  if (heightUnit.value === "cm") {
+    editHeightCm.style.display = "block";
+    imperialHeightFields.style.display = "none";
+  } else {
+    editHeightCm.style.display = "none";
+    imperialHeightFields.style.display = "flex";
+  }
+});
+
 function updateDOM(data, user) {
   originalData = structuredClone(data);
 
@@ -79,7 +95,6 @@ function updateDOM(data, user) {
 
   const pronouns = data.pronouns || "";
   pronounsDisplay.textContent = pronouns ? `(${pronouns})` : "";
-
   editPronouns.value = ["He/Him", "She/Her", "They/Them", "Any Pronouns"].includes(pronouns) ? pronouns : "Custom";
   customPronounsInput.value = editPronouns.value === "Custom" ? pronouns : "";
   customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
@@ -89,25 +104,30 @@ function updateDOM(data, user) {
   bmiStatusEl.style.color = status.color;
   bmiStatusEl.style.fontWeight = "bold";
 
-  if (registeredAtEl && data.registeredAt?.toDate) {
-    registeredAtEl.textContent = data.registeredAt.toDate().toLocaleDateString();
-  } else {
-    registeredAtEl.textContent = "—";
-  }
+  registeredAtEl.textContent = data.registeredAt?.toDate?.().toLocaleDateString() || "—";
+  lastLoginEl.textContent = new Date(user.metadata?.lastSignInTime || Date.now()).toLocaleString();
 
-  if (lastLoginEl && user.metadata?.lastSignInTime) {
-    lastLoginEl.textContent = new Date(user.metadata.lastSignInTime).toLocaleString();
-  }
-
-  if (data.localImageBase64) {
-    profileImage.src = data.localImageBase64;
-  }
+  if (data.localImageBase64) profileImage.src = data.localImageBase64;
 
   editBio.value = data.bio || "";
   bioCharCount.textContent = `${editBio.value.length}/200`;
   editAge.value = data.age || "";
-  editHeight.value = data.height?.split(" ")[0] || "";
-  heightUnit.value = data.height?.split(" ")[1] || "cm";
+
+  const [heightVal, unit] = (data.height || "").split(" ");
+  heightUnit.value = unit || "cm";
+
+  if (unit === "ft") {
+    const totalInches = parseFloat(heightVal) * 12;
+    editHeightFt.value = Math.floor(totalInches / 12);
+    editHeightIn.value = Math.round(totalInches % 12);
+    editHeightCm.style.display = "none";
+    imperialHeightFields.style.display = "flex";
+  } else {
+    editHeightCm.value = heightVal || "";
+    editHeightCm.style.display = "block";
+    imperialHeightFields.style.display = "none";
+  }
+
   editWeight.value = data.weight?.split(" ")[0] || "";
   weightUnit.value = data.weight?.split(" ")[1] || "kg";
   editGender.value = data.gender || "";
@@ -153,27 +173,32 @@ if (profileImageInput) {
   });
 }
 
-editProfileButton.addEventListener("click", () => {
-  toggleEdit(true);
-});
-
+editProfileButton.addEventListener("click", () => toggleEdit(true));
 saveProfileButton.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) return;
 
   const ageVal = parseInt(editAge.value);
   const weightVal = parseFloat(editWeight.value);
-  const heightVal = parseFloat(editHeight.value);
+  let heightVal, heightText;
+
+  if (heightUnit.value === "cm") {
+    heightVal = parseFloat(editHeightCm.value);
+    heightText = `${heightVal} cm`;
+  } else {
+    const ft = parseFloat(editHeightFt.value) || 0;
+    const inches = parseFloat(editHeightIn.value) || 0;
+    heightVal = (ft * 12) + inches;
+    heightText = `${(heightVal / 12).toFixed(2)} ft`;
+  }
+
   const bioVal = editBio.value.trim().slice(0, 200);
+  const pronounsVal = editPronouns.value === "Custom" ? customPronounsInput.value.trim() : editPronouns.value;
 
   if (isNaN(ageVal) || isNaN(weightVal) || isNaN(heightVal)) {
     alert("Please enter valid numbers for age, height, and weight.");
     return;
   }
-
-  let pronounsVal = editPronouns.value === "Custom"
-    ? customPronounsInput.value.trim()
-    : editPronouns.value;
 
   const docRef = doc(db, "profile", user.uid);
   const currentSnap = await getDoc(docRef);
@@ -184,16 +209,15 @@ saveProfileButton.addEventListener("click", async () => {
     username: currentData.username || user.email?.split("@")[0] || "—",
     bio: bioVal,
     age: ageVal,
-    height: `${heightVal} ${heightUnit.value}`,
+    height: heightText,
     weight: `${weightVal} ${weightUnit.value}`,
     gender: editGender.value.trim(),
     pronouns: pronounsVal
   };
 
   let heightMeters = heightVal;
-  if (heightUnit.value === "in") heightMeters *= 0.0254;
-  else if (heightUnit.value === "ft") heightMeters *= 0.3048;
-  else heightMeters /= 100;
+  if (heightUnit.value === "cm") heightMeters /= 100;
+  else heightMeters *= 0.0254;
 
   if (heightMeters && weightVal) {
     updatedData.bmi = (weightVal / (heightMeters * heightMeters)).toFixed(1);
@@ -210,21 +234,7 @@ saveProfileButton.addEventListener("click", async () => {
 });
 
 cancelEditButton.addEventListener("click", () => {
-  editBio.value = originalData.bio || "";
-  editAge.value = originalData.age || "";
-  editHeight.value = originalData.height?.split(" ")[0] || "";
-  heightUnit.value = originalData.height?.split(" ")[1] || "cm";
-  editWeight.value = originalData.weight?.split(" ")[0] || "";
-  weightUnit.value = originalData.weight?.split(" ")[1] || "kg";
-  editGender.value = originalData.gender || "";
-
-  const originalPronouns = originalData.pronouns || "";
-  editPronouns.value = ["He/Him", "She/Her", "They/Them", "Any Pronouns"].includes(originalPronouns)
-    ? originalPronouns
-    : "Custom";
-  customPronounsInput.value = editPronouns.value === "Custom" ? originalPronouns : "";
-  customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
-
+  updateDOM(originalData, auth.currentUser);
   toggleEdit(false);
 });
 
@@ -236,18 +246,33 @@ function toggleEdit(isEditing) {
 
   togglePair(bio, editBio);
   togglePair(age, editAge);
-  togglePair(height, editHeight);
   togglePair(weight, editWeight);
   togglePair(gender, editGender);
   togglePair(pronounsDisplay, editPronouns);
 
-  heightUnit.parentElement.classList.toggle("show", isEditing);
-  weightUnit.parentElement.classList.toggle("show", isEditing);
+  const heightDisplay = height.closest(".fade-toggle");
+  const heightEdit = editHeightCm.closest(".fade-toggle");
+  if (heightDisplay && heightEdit) {
+    heightDisplay.classList.toggle("show", !isEditing);
+    heightEdit.classList.toggle("show", isEditing);
+  }
+
+  const weightDisplay = weight.closest(".fade-toggle");
+  const weightEdit = editWeight.closest(".fade-toggle");
+  if (weightDisplay && weightEdit) {
+    weightDisplay.classList.toggle("show", !isEditing);
+    weightEdit.classList.toggle("show", isEditing);
+  }
+
+  heightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
+  weightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
+
   customPronounsInput.style.display = isEditing && editPronouns.value === "Custom" ? "block" : "none";
 
   editProfileButton.style.display = isEditing ? "none" : "inline-block";
   saveProfileButton.style.display = isEditing ? "inline-block" : "none";
   cancelEditButton.style.display = isEditing ? "inline-block" : "none";
 }
+
 
 
