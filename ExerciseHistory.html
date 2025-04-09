@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise History</title>
+    <link rel="stylesheet" href="ExerciseHistory.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- Main Taskbar -->
+    <script src="TaskBar.js"></script>
+
+    <div class="layout">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Exercise History</h1>
+                <!-- Sub-Taskbar -->
+                <div class="sub-taskbar">
+                    <a href="FoodHistory.html" class="sub-taskbar-link">Food History</a>
+                    <a href="ExerciseHistory.html" class="sub-taskbar-link active">Exercise History</a>
+                </div>
+            </header>
+
+            <!-- Exercise History Section -->
+            <section class="history-section">
+                <table id="exerciseTable" class="exercise-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type of Exercise</th>
+                            <th>Type of Cardio/Workout</th>
+                            <th>Distance</th>
+                            <th>Reps</th>
+                            <th>Sets</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exerciseTableBody">
+                        <!-- Exercise history rows will be dynamically loaded here -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Include the ExerciseHistory.js script -->
+    <script type="module" src="ExerciseHistory.js"></script>
+</body>
+</html>

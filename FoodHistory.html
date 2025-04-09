@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food History</title>
+    <link rel="stylesheet" href="FoodHistory.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- Main Taskbar -->
+    <script src="TaskBar.js"></script>
+
+    <div class="layout">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Food History</h1>
+                <!-- Sub-Taskbar -->
+                <div class="sub-taskbar">
+                    <a href="FoodHistory.html" class="sub-taskbar-link active">Food History</a>
+                    <a href="ExerciseHistory.html" class="sub-taskbar-link">Exercise History</a>
+                </div>
+            </header>
+
+            <!-- Food History Section -->
+            <section class="history-section">
+                <table id="foodTable" class="food-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Food Entry</th>
+                        </tr>
+                    </thead>
+                    <tbody id="foodTableBody">
+                        <!-- Food history rows will be dynamically loaded here -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Include the FoodHistory.js script -->
+    <script type="module" src="FoodHistory.js"></script>
+</body>
+</html>
