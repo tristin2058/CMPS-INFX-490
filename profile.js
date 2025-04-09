@@ -1,5 +1,5 @@
 // Finalized profile.js with height field improvements + pronouns support
-// FIXED: Full rewrite with proper toggle handling for edit mode
+// FIXED: Full rewrite with proper toggle handling for edit mode and corrected BMI logic
 
 import { auth, db } from "./firebase-config.js";
 import {
@@ -117,9 +117,9 @@ function updateDOM(data, user) {
   heightUnit.value = unit || "cm";
 
   if (unit === "ft") {
-    const totalInches = parseFloat(heightVal) * 12;
-    editHeightFt.value = Math.floor(totalInches / 12);
-    editHeightIn.value = Math.round(totalInches % 12);
+    const feetVal = parseFloat(heightVal);
+    editHeightFt.value = Math.floor(feetVal);
+    editHeightIn.value = Math.round((feetVal - Math.floor(feetVal)) * 12);
     editHeightCm.style.display = "none";
     imperialHeightFields.style.display = "flex";
   } else {
@@ -210,18 +210,24 @@ saveProfileButton.addEventListener("click", async () => {
     bio: bioVal,
     age: ageVal,
     height: heightText,
+    heightInInches: heightUnit.value === "cm" ? null : heightVal, // new raw value for imperial
     weight: `${weightVal} ${weightUnit.value}`,
     gender: editGender.value.trim(),
     pronouns: pronounsVal
   };
 
-  let heightMeters = heightVal;
-  if (heightUnit.value === "cm") heightMeters /= 100;
-  else heightMeters *= 0.0254;
+  let heightMeters;
+  if (heightUnit.value === "cm") {
+    heightMeters = heightVal / 100;
+  } else {
+    heightMeters = updatedData.heightInInches * 0.0254;
+  }
 
   if (heightMeters && weightVal) {
-    updatedData.bmi = (weightVal / (heightMeters * heightMeters)).toFixed(1);
+    const weightKg = weightUnit.value === "lb" ? weightVal * 0.453592 : weightVal;
+    updatedData.bmi = (weightKg / (heightMeters * heightMeters)).toFixed(1);
   }
+  
 
   try {
     await updateDoc(docRef, updatedData);
@@ -273,6 +279,4 @@ function toggleEdit(isEditing) {
   saveProfileButton.style.display = isEditing ? "inline-block" : "none";
   cancelEditButton.style.display = isEditing ? "inline-block" : "none";
 }
-
-
 
