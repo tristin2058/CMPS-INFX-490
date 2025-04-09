@@ -1,4 +1,4 @@
-/* ✅ New Fluid Dashboard-style Profile Page */
+/* ✅ Fluid Profile Page (Compatible with Taskbar) */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
 body {
@@ -8,35 +8,7 @@ body {
   color: white;
   padding: 0;
   min-height: 100vh;
-}
-
-header.main-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background: rgba(15, 32, 39, 0.9);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-header.main-nav h1 {
-  font-size: 20px;
-  color: #00bcd4;
-  margin: 0;
-}
-
-header.main-nav nav a {
-  margin-left: 20px;
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-header.main-nav nav a:hover {
-  text-decoration: underline;
+  padding-top: 70px;
 }
 
 main {
