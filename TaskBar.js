@@ -13,8 +13,25 @@ function createTaskbar() {
                 position: fixed;
                 top: 0;
                 left: 0;
-                z-index: 1000;
+                z-index: 50;
             }
+                .logo-btn {
+                    position: absolute;
+                    top: 0px; /* Adjust height */
+                    left: 0px;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 0;
+                    display: block;
+                    z-index: 100; /* Ensures button is visible */
+                    /* Ensures it appears above other elements */
+}
+.logo-btn img {
+  width: 70px; /* Slightly larger */
+  height: 70px;
+  display: block; /* Ensures image renders */
+}
             .nav-links {
                 display: flex;
                 flex: 1;
