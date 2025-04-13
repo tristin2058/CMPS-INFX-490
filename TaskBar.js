@@ -62,7 +62,7 @@ function createTaskbar() {
             }
 
             .taskbar-left {
-                color: #E2E8F0;
+                color: #63B3ED;
                 text-decoration: none;
                 font-weight: bold;
                 transition: background-color 0.3s ease;
@@ -125,10 +125,11 @@ function createTaskbar() {
         </style>
         <div class="taskbar">
             <div class="taskbar-left">
+                <img src="360_transparent.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
                 Thrive360
             </div>
             <div class="nav-links">
-                <a href="index.html">Dashboard</a>
+                <a href="dashboard.html">Dashboard</a>
                 <div class="dropdown">
                     <button>Log▼</button>
                     <div class="dropdown-menu">
