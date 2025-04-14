@@ -4,21 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thrive360 Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script type="module" src="chatbot-ui.js"></script> <!-- Use type="module" -->
+    <script type="module" src="chatbot-ui.js"></script>
 </head>
-
-
 <body>
-    <!-- Taskbar -->
     <script src="TaskBar.js"></script>
-
     <div class="dashboard-container">
         <header class="dashboard-header">
-            <h1>Dashboard</h1>
+            <h1>Welcome!</h1>
             <div class="date-display" id="current-date"></div>
         </header>
 
@@ -119,16 +115,111 @@
                         <span id="burn-goal">500</span>
                     </div>
                 </div>
-            </section>
 
-            <!-- History Section -->
-            <section class="history">
-                <h2>History</h2>
-                <div id="historyList"></div>
-            </section>
-        </main>
+                <!-- Water Intake -->
+                <div class="metric-card water">
+                    <h2><i class="fas fa-tint"></i> Water</h2>
+                    <div class="water-container">
+                        <div class="water-glasses">
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                            <div class="glass" data-filled="false"></div>
+                        </div>
+                        <span class="water-text" id="water-text">0/8 glasses</span>
+                    </div>
+                    <button class="btn" id="add-water-btn">Add Glass</button>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3>Weight History</h3>
+                    <canvas id="weight-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Weekly Activity</h3>
+                    <canvas id="activity-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Log Meal</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-running"></i>
+                    <span>Start Workout</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-moon"></i>
+                    <span>Log Sleep</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Weight Log Modal -->
+    <div class="modal" id="weight-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Log Weight</h2>
+            <div class="form-group">
+                <label for="weight-input">Current Weight (lbs)</label>
+                <input type="number" id="weight-input" step="0.1" placeholder="Enter your weight">
+            </div>
+            <button class="btn" id="submit-weight-btn">Submit</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Settings</h2>
+            
+            <div class="form-group">
+                <label>Unit System</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="unit-system" value="imperial" checked> Imperial (lbs, miles)
+                    </label>
+                    <label>
+                        <input type="radio" name="unit-system" value="metric"> Metric (kg, km)
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="step-goal">Daily Step Goal</label>
+                <input type="number" id="step-goal" placeholder="Enter step goal" value="10000">
+            </div>
+            
+            <div class="form-group">
+                <label for="calorie-goal">Daily Calorie Goal</label>
+                <input type="number" id="calorie-goal" placeholder="Enter calorie goal" value="2000">
+            </div>
+            
+            <div class="form-group">
+                <label for="water-goal">Daily Water Goal (glasses)</label>
+                <input type="number" id="water-goal" placeholder="Enter water goal" value="8">
+            </div>
+
+            <button class="btn" id="save-settings-btn">Save Settings</button>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
 </body>
 </html>
