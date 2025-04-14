@@ -1,3 +1,2 @@
 #Ignore environment variable with API keys
 .env
-node_modules
