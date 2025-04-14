@@ -2,12 +2,14 @@
 
 body {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
     color: white;
     display: flex;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    line-height: 1.6;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .layout {
@@ -40,7 +42,7 @@ body {
 .profile-btn:hover {
     color: #3cc8f2;
 }
-
+/* Exercise Sections Container */
 .exercise-sections {
     display: flex;
     gap: 20px;
@@ -265,7 +267,35 @@ button:hover {
 }
 
 .modal-content .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.05);
+    background: #f4f4f9;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+/* Styling for the dropdown suggestions */
+.suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    width: calc(100% - 20px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 10;
+}
+
+/* Individual suggestion items */
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+/* Hover effect for better UX */
+.suggestion-item:hover {
+    background: #007BFF;
     color: white;
     border: 1px solid #64d9ff;
 }

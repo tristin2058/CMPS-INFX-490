@@ -66,10 +66,12 @@ const loadExerciseData = async () => {
     loadExerciseHistory(user.uid);
 };
 
+const formattedDate = new Date().toISOString();
+
 // Function to load and display historical exercise data for both Cardio and Workouts
 const loadExerciseHistory = async (uid) => {
-    const cardioQuery = collection(db, `Exercise Log/Cardio/User's Exercise/${uid}/exercises`);
-    const workoutsQuery = collection(db, `Exercise Log/Workouts/User's Exercise/${uid}/exercises`);
+    const cardioQuery = collection(db, `Exercise Log/Cardio/User's Exercise/${uid}/Exercises`);
+    const workoutsQuery = collection(db, `Exercise Log/Workouts/User's Exercise/${uid}/Exercises`);
 
     const [cardioSnapshot, workoutsSnapshot] = await Promise.all([
         getDocs(cardioQuery),
@@ -166,13 +168,13 @@ const saveExerciseData = async () => {
         console.log("Cumulative data saved:", updatedData);
 
         // Save historical exercise data
-        const exerciseHistoryRef = collection(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Previous Exercises`);
-        await addDoc(exerciseHistoryRef, {
+        const exerciseHistoryRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, formattedDate);
+        await setDoc(exerciseHistoryRef, {
             exercise: newExercise,
             duration: newDuration,
             reps: newReps,
             sets: newSets,
-            date: new Date().toISOString()
+            date: formattedDate
         });
 
         console.log("Historical data saved:", {
