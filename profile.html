@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profile</title>
   <link rel="stylesheet" href="profile.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module" src="chatbot-ui.js"></script>
 </head>
 <body>
-
-    <!-- Logo as a button to navigate to the dashboard -->
-    <button class="logo-btn" onclick="location.href='dashboard.html'">
-        <img src="360_transparent.png" alt="Logo">
-    </button>
-    <script src="taskbar.js"></script> 
+    <script src="TaskBar.js"></script> 
     <div class="layout">
         <main class="main-content">
             <header class="main-header">
@@ -101,19 +100,7 @@
             </section>
         </main>
     </div>
-  <header class="main-nav">
-    <h1>Thrive360</h1>
-    <nav>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="profile.html">Profile</a>
-      <a href="logs.html">Log History</a>
-      <a href="sign-in.html" onclick="event.preventDefault(); logout();">Sign Out</a>
-    </nav>
-  </header>
-
-
   <main>
-    <!-- Profile Header -->
     <section class="profile-header">
       <div>
         <img id="profileImage" src="place-holder-image.jpg" alt="Profile Picture" />
@@ -146,7 +133,6 @@
       </div>
     </section>
 
-    <!-- Stats Section -->
     <section class="stats-section">
       <div class="stat-card">
         <h3>Age</h3>
@@ -160,32 +146,21 @@
 
       <div class="stat-card">
         <h3>Height</h3>
-      
-        <!-- View Mode -->
         <div class="fade-toggle show">
           <p id="height"></p>
         </div>
-      
-        <!-- Edit Mode -->
         <div class="fade-toggle">
-          <!-- Metric input -->
           <input id="editHeightCm" type="number" placeholder="Height in cm" />
-      
-          <!-- Imperial inputs -->
           <div id="editHeightImperial" style="display: none; display: flex; gap: 10px;">
             <input id="editHeightFt" type="number" placeholder="ft" />
             <input id="editHeightIn" type="number" placeholder="in" />
           </div>
-      
-          <!-- Unit selector -->
           <select id="heightUnit">
             <option value="cm">cm</option>
             <option value="ft">ft/in</option>
           </select>
         </div>
       </div>
-      
-      
 
       <div class="stat-card">
         <h3>Weight</h3>
@@ -210,14 +185,20 @@
           <select id="editGender">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
+            <option value="Non-binary">Non-binary</option>
+            <option value="Prefer not to say">Prefer not to say</option>
             <option value="Other">Other</option>
           </select>
+          <input type="text" id="customGender" placeholder="Please specify" style="display: none;" />
         </div>
       </div>
 
       <div class="stat-card">
         <h3>BMI</h3>
-        <p><span id="bmi"></span> <span id="bmiStatus"></span></p>
+        <div class="fade-toggle show">
+          <p><span id="bmi"></span> <span id="bmiStatus" style="font-weight: bold;"></span></p>
+        </div>
+        
       </div>
 
       <div class="stat-card">
@@ -231,14 +212,12 @@
       </div>
     </section>
 
-    <!-- Buttons -->
     <section class="button-container">
       <button id="editProfileButton">Edit Profile</button>
       <button id="saveProfileButton" style="display: none;">Save Changes</button>
       <button id="cancelEditButton" style="display: none;">Cancel</button>
     </section>
 
-    <!-- Dashboard (Unchanged) -->
     <section class="dashboard-section">
       <div class="dashboard-card">
         <h3>Current Goals</h3>
@@ -262,4 +241,5 @@
   <script type="module" src="profile.js"></script>
 </body>
 </html>
+
 

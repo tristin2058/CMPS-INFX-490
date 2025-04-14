@@ -22,15 +22,14 @@ function createTaskbar() {
                 width: 100%;
                 position: fixed;
                 top: 0;
-
-                left: 0;
-                z-index: 50;
+                z-index: 1000;
             }
 
             .nav-links {
                 display: flex;
                 gap: 25px;
                 align-items: center;
+                flex-wrap: nowrap; /* Prevent links from wrapping */
             }
 
             .nav-links a {
@@ -41,6 +40,7 @@ function createTaskbar() {
                 transition: background-color 0.3s ease;
                 border-radius: 5px;
                 font-size: 16px;
+                white-space: nowrap; /* Prevent text from wrapping */
             }
 
             .nav-links a:hover {
@@ -59,6 +59,16 @@ function createTaskbar() {
                 padding: 10px;
                 cursor: pointer;
                 font-size: 16px;
+            }
+
+            .taskbar-left {
+                color: #63B3ED;
+                text-decoration: none;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+                border-radius: 5px;
+                font-size: 25px;
+                white-space: nowrap; /* Prevent text from wrapping */
             }
 
             .dropdown-menu {
@@ -92,18 +102,46 @@ function createTaskbar() {
             .sign-out {
                 color: #E53E3E;
             }
+
+            /* Responsive Design for Smaller Screens */
+            @media (max-width: 768px) {
+                .taskbar {
+                    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+                    padding: 10px 20px;
+                }
+
+                .nav-links {
+                    flex-direction: column; /* Stack links vertically */
+                    gap: 10px;
+                    width: 100%;
+                    align-items: flex-start;
+                }
+
+                .dropdown-menu {
+                    position: static; /* Ensure dropdowns display properly */
+                    box-shadow: none;
+                }
+            }
         </style>
         <div class="taskbar">
             <div class="taskbar-left">
+                <img src="360_transparent.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
                 Thrive360
             </div>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <div class="dropdown">
-                    <button>Log History ▼</button>
+                    <button>Log▼</button>
                     <div class="dropdown-menu">
                         <a href="FoodLog.html">Food Log</a>
                         <a href="exercise-logging.html">Exercise Log</a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button>History▼</button>
+                    <div class="dropdown-menu">
+                        <a href="FoodHistory.html">Food History</a>
+                        <a href="ExerciseHistory.html">Exercise History</a>
                     </div>
                 </div>
                 <a href="Profile.html">Profile</a>

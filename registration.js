@@ -6,6 +6,12 @@ const form = document.getElementById("registrationForm");
 const genderSelect = document.getElementById("gender");
 const genderOtherInput = document.getElementById("genderOther");
 
+const heightUnitSelect = document.getElementById("heightUnit");
+const heightCmInput = document.getElementById("heightCm");
+const heightImperialGroup = document.getElementById("heightImperial");
+const heightFtInput = document.getElementById("heightFt");
+const heightInInput = document.getElementById("heightIn");
+
 // Show/hide "Other" gender input
 genderSelect.addEventListener("change", () => {
   if (genderSelect.value === "Other") {
@@ -14,6 +20,17 @@ genderSelect.addEventListener("change", () => {
   } else {
     genderOtherInput.style.display = "none";
     genderOtherInput.required = false;
+  }
+});
+
+// Toggle height input method
+heightUnitSelect.addEventListener("change", () => {
+  if (heightUnitSelect.value === "cm") {
+    heightCmInput.style.display = "block";
+    heightImperialGroup.style.display = "none";
+  } else {
+    heightCmInput.style.display = "none";
+    heightImperialGroup.style.display = "flex";
   }
 });
 
@@ -30,15 +47,23 @@ form.addEventListener("submit", async (e) => {
       ? genderOtherInput.value.trim()
       : genderSelect.value;
 
-  const height = parseFloat(document.getElementById("height").value);
-  const heightUnit = document.getElementById("heightUnit").value;
   const weight = parseFloat(document.getElementById("weight").value);
   const weightUnit = document.getElementById("weightUnit").value;
 
-  let heightMeters = height;
-  if (heightUnit === "cm") heightMeters = height / 100;
-  else if (heightUnit === "in") heightMeters = height * 0.0254;
-  else if (heightUnit === "ft") heightMeters = height * 0.3048;
+  const heightUnit = heightUnitSelect.value;
+  let heightMeters, heightText;
+
+  if (heightUnit === "cm") {
+    const heightCm = parseFloat(heightCmInput.value);
+    heightMeters = heightCm / 100;
+    heightText = `${heightCm} cm`;
+  } else {
+    const ft = parseFloat(heightFtInput.value) || 0;
+    const inches = parseFloat(heightInInput.value) || 0;
+    const totalInches = (ft * 12) + inches;
+    heightMeters = totalInches * 0.0254;
+    heightText = `${(totalInches / 12).toFixed(2)} ft`;
+  }
 
   let weightKg = weight;
   if (weightUnit === "lb") weightKg = weight * 0.453592;
@@ -55,7 +80,7 @@ form.addEventListener("submit", async (e) => {
       email,
       age,
       gender,
-      height: `${height} ${heightUnit}`,
+      height: heightText,
       weight: `${weight} ${weightUnit}`,
       bmi
     });
@@ -67,3 +92,4 @@ form.addEventListener("submit", async (e) => {
     console.error(err);
   }
 });
+
