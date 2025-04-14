@@ -11,96 +11,10 @@
   <script type="module" src="chatbot-ui.js"></script>
 </head>
 <body>
-    <script src="TaskBar.js"></script> 
-    <div class="layout">
-        <main class="main-content">
-            <header class="main-header">
-                <h1>Profile</h1>
-                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
-            </header>
+  <script src="TaskBar.js"></script>
 
-            <section class="profile-section">
-                <div class="profile-card">
-                    <input type="text" id="imageURL" placeholder="Enter image link">
-                            <button onclick="updateProfilePic()">Set Profile Picture</button>
-
-                                <div class="profile-pic" id="profilePic"></div>
-
-                                <script>
-                                function updateProfilePic() {
-                                let imageUrl = document.getElementById("imageURL").value;
-                                document.getElementById("profilePic").style.backgroundImage = `url('${imageUrl}')`;
-                                    }
-                                </script>
-
-                    <div class="profile-header">
-                        <img src="profile-placeholder.png" alt="Profile Picture" class="profile-picture">
-                        <div>
-                            <h2 id="displayName">Display Name</h2>
-                            <p id="username">@name</p>
-                        </div>
-                    </div>
-                    <div class="profile-bio">
-                        <h3>Bio</h3>
-                        <p id="bio">Bio section</p>
-                        <textarea id="editBio" class="edit-input" style="display: none;"></textarea>
-                    </div>
-                    <div class="profile-stats">
-                        <h3>Stats</h3>
-                        <div class="stat-item">
-                            <p id="age">Age: </p>
-                            <input type="number" id="editAge" class="edit-input" style="display: none;">
-                        </div>
-                        <div class="stat-item">
-                            <p id="height">Height: </p>
-                            <input type="text" id="editHeight" class="edit-input" style="display: none;">
-                            <select id="heightUnit" class="edit-input" style="display: none;">
-                                <option value="cm">cm</option>
-                                <option value="m">m</option>
-                                <option value="in">in</option>
-                                <option value="ft">ft</option>
-                            </select>
-                        </div>
-                        <div class="stat-item">
-                            <p id="weight">Weight: </p>
-                            <input type="number" id="editWeight" class="edit-input" style="display: none;">
-                            <select id="weightUnit" class="edit-input" style="display: none;">
-                                <option value="kg">kg</option>
-                                <option value="lb">lb</option>
-                            </select>
-                        </div>
-                        <div class="stat-item">
-                            <p id="gender">Gender: </p>
-                            <input type="text" id="editGender" class="edit-input" style="display: none;">
-                        </div>
-                        <div class="stat-item">
-                            <p id="bmi">BMI: </p>
-                        </div>
-                    </div>
-                    <button id="editProfileButton" class="btn-edit">Edit Profile</button>
-                    <button id="saveProfileButton" class="btn-save" style="display: none;">Save Changes</button>
-                    <button id="cancelEditButton" class="btn-secondary" style="display: none;">Cancel</button>
-                </div>
-                <div class="goals-card">
-                    <h3>Current Exercise Goals</h3>
-                    <p id="goals">User can put things that they’re trying to achieve like losing a certain amount of weight</p>
-                </div>
-                <div class="milestones-card">
-                    <h3>Recently Reached Milestones</h3>
-                    <p id="milestones">User can pin previous goals that they met recently</p>
-                </div>
-                <div class="log-history-card">
-                    <h3>Recent Log History</h3>
-                    <div id="logHistory">Recent log history</div>
-                </div>
-                <div class="charts-card">
-                    <h3>Graphs and Charts</h3>
-                    <div id="charts">Some sort of graphs and charts based on recent logging history</div>
-                </div>
-            </section>
-        </main>
-    </div>
   <main>
+    <!-- Profile Header -->
     <section class="profile-header">
       <div>
         <img id="profileImage" src="place-holder-image.jpg" alt="Profile Picture" />
@@ -133,6 +47,7 @@
       </div>
     </section>
 
+    <!-- Stats Section -->
     <section class="stats-section">
       <div class="stat-card">
         <h3>Age</h3>
@@ -146,21 +61,32 @@
 
       <div class="stat-card">
         <h3>Height</h3>
+      
+        <!-- View Mode -->
         <div class="fade-toggle show">
           <p id="height"></p>
         </div>
+      
+        <!-- Edit Mode -->
         <div class="fade-toggle">
+          <!-- Metric input -->
           <input id="editHeightCm" type="number" placeholder="Height in cm" />
+      
+          <!-- Imperial inputs -->
           <div id="editHeightImperial" style="display: none; display: flex; gap: 10px;">
             <input id="editHeightFt" type="number" placeholder="ft" />
             <input id="editHeightIn" type="number" placeholder="in" />
           </div>
+      
+          <!-- Unit selector -->
           <select id="heightUnit">
             <option value="cm">cm</option>
             <option value="ft">ft/in</option>
           </select>
         </div>
       </div>
+      
+      
 
       <div class="stat-card">
         <h3>Weight</h3>
@@ -185,20 +111,14 @@
           <select id="editGender">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-            <option value="Non-binary">Non-binary</option>
-            <option value="Prefer not to say">Prefer not to say</option>
             <option value="Other">Other</option>
           </select>
-          <input type="text" id="customGender" placeholder="Please specify" style="display: none;" />
         </div>
       </div>
 
       <div class="stat-card">
         <h3>BMI</h3>
-        <div class="fade-toggle show">
-          <p><span id="bmi"></span> <span id="bmiStatus" style="font-weight: bold;"></span></p>
-        </div>
-        
+        <p><span id="bmi"></span> <span id="bmiStatus"></span></p>
       </div>
 
       <div class="stat-card">
@@ -212,12 +132,14 @@
       </div>
     </section>
 
+    <!-- Buttons -->
     <section class="button-container">
       <button id="editProfileButton">Edit Profile</button>
       <button id="saveProfileButton" style="display: none;">Save Changes</button>
       <button id="cancelEditButton" style="display: none;">Cancel</button>
     </section>
 
+    <!-- Dashboard (Unchanged) -->
     <section class="dashboard-section">
       <div class="dashboard-card">
         <h3>Current Goals</h3>
@@ -241,5 +163,4 @@
   <script type="module" src="profile.js"></script>
 </body>
 </html>
-
 

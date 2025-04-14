@@ -129,7 +129,6 @@ const saveExerciseData = async () => {
         let currentData = userSnap.exists() ? userSnap.data() : {};
 
         // Parse existing values, default to 0 if missing
-        let previousExercise = currentData.exercise || "None";
         let previousDuration = parseInt(currentData.duration) || 0;
         let previousReps = parseInt(currentData.reps) || 0;
         let previousSets = parseInt(currentData.sets) || 0;
@@ -168,6 +167,7 @@ const saveExerciseData = async () => {
         console.log("Cumulative data saved:", updatedData);
 
         // Save historical exercise data
+        const formattedDate = new Date().toISOString();
         const exerciseHistoryRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, formattedDate);
         await setDoc(exerciseHistoryRef, {
             exercise: newExercise,
@@ -182,7 +182,7 @@ const saveExerciseData = async () => {
             duration: newDuration,
             reps: newReps,
             sets: newSets,
-            date: new Date().toISOString()
+            date: formattedDate
         });
 
         alert("Exercise data updated successfully!");
