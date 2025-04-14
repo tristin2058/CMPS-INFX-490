@@ -1,6 +1,3 @@
-// Finalized profile.js with height field improvements + pronouns support
-// FIXED: Full rewrite with proper toggle handling for edit mode
-
 import { auth, db } from "./firebase-config.js";
 import {
   onAuthStateChanged,
@@ -14,7 +11,6 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Element references
 const displayName = document.getElementById("displayName");
 const username = document.getElementById("username");
 const bio = document.getElementById("bio");
@@ -38,6 +34,7 @@ const editAge = document.getElementById("editAge");
 const editWeight = document.getElementById("editWeight");
 const weightUnit = document.getElementById("weightUnit");
 const editGender = document.getElementById("editGender");
+const customGenderInput = document.getElementById("customGender");
 
 const editHeightCm = document.getElementById("editHeightCm");
 const editHeightFt = document.getElementById("editHeightFt");
@@ -51,15 +48,6 @@ const customPronounsInput = document.getElementById("customPronouns");
 
 let originalData = {};
 
-function getHealthStatus(bmi) {
-  const value = parseFloat(bmi);
-  if (isNaN(value)) return { label: "Unknown", color: "#999" };
-  if (value < 18.5) return { label: "Underweight", color: "#2196f3" };
-  if (value < 25) return { label: "Normal", color: "#4caf50" };
-  if (value < 30) return { label: "Overweight", color: "#ff9800" };
-  return { label: "Obese", color: "#f44336" };
-}
-
 editBio.addEventListener("input", () => {
   if (editBio.value.length > 200) {
     editBio.value = editBio.value.substring(0, 200);
@@ -69,6 +57,10 @@ editBio.addEventListener("input", () => {
 
 editPronouns.addEventListener("change", () => {
   customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
+});
+
+editGender.addEventListener("change", () => {
+  customGenderInput.style.display = editGender.value === "Other" ? "block" : "none";
 });
 
 heightUnit.addEventListener("change", () => {
@@ -81,6 +73,15 @@ heightUnit.addEventListener("change", () => {
   }
 });
 
+function getHealthStatus(bmi) {
+  const value = parseFloat(bmi);
+  if (isNaN(value)) return { label: "Unknown", color: "#999" };
+  if (value < 18.5) return { label: "Underweight", color: "#2196f3" };
+  if (value < 25) return { label: "Normal", color: "#4caf50" };
+  if (value < 30) return { label: "Overweight", color: "#ff9800" };
+  return { label: "Obese", color: "#f44336" };
+}
+
 function updateDOM(data, user) {
   originalData = structuredClone(data);
 
@@ -88,10 +89,16 @@ function updateDOM(data, user) {
   username.textContent = data.username ? `@${data.username}` : "@—";
   bio.textContent = data.bio || "—";
   age.textContent = data.age ?? "—";
+  editAge.value = data.age ?? "";
   height.textContent = data.height ?? "—";
   weight.textContent = data.weight ?? "—";
   gender.textContent = data.gender ?? "—";
   bmi.textContent = data.bmi ?? "—";
+  const status = getHealthStatus(data.bmi);
+  bmiStatusEl.textContent = status.label;
+  bmiStatusEl.style.color = status.color;
+
+
 
   const pronouns = data.pronouns || "";
   pronounsDisplay.textContent = pronouns ? `(${pronouns})` : "";
@@ -99,27 +106,22 @@ function updateDOM(data, user) {
   customPronounsInput.value = editPronouns.value === "Custom" ? pronouns : "";
   customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
 
-  const status = getHealthStatus(data.bmi);
-  bmiStatusEl.textContent = status.label;
-  bmiStatusEl.style.color = status.color;
-  bmiStatusEl.style.fontWeight = "bold";
-
-  registeredAtEl.textContent = data.registeredAt?.toDate?.().toLocaleDateString() || "—";
-  lastLoginEl.textContent = new Date(user.metadata?.lastSignInTime || Date.now()).toLocaleString();
-
-  if (data.localImageBase64) profileImage.src = data.localImageBase64;
-
-  editBio.value = data.bio || "";
-  bioCharCount.textContent = `${editBio.value.length}/200`;
-  editAge.value = data.age || "";
+  if (["Male", "Female", "Non-binary", "Prefer not to say"].includes(data.gender)) {
+    editGender.value = data.gender;
+    customGenderInput.style.display = "none";
+  } else {
+    editGender.value = "Other";
+    customGenderInput.style.display = "block";
+    customGenderInput.value = data.gender || "";
+  }
 
   const [heightVal, unit] = (data.height || "").split(" ");
   heightUnit.value = unit || "cm";
 
   if (unit === "ft") {
-    const totalInches = parseFloat(heightVal) * 12;
-    editHeightFt.value = Math.floor(totalInches / 12);
-    editHeightIn.value = Math.round(totalInches % 12);
+    const feetVal = parseFloat(heightVal);
+    editHeightFt.value = Math.floor(feetVal);
+    editHeightIn.value = Math.round((feetVal - Math.floor(feetVal)) * 12);
     editHeightCm.style.display = "none";
     imperialHeightFields.style.display = "flex";
   } else {
@@ -130,7 +132,17 @@ function updateDOM(data, user) {
 
   editWeight.value = data.weight?.split(" ")[0] || "";
   weightUnit.value = data.weight?.split(" ")[1] || "kg";
-  editGender.value = data.gender || "";
+
+  if (data.registeredAt?.seconds) {
+    const registeredDate = new Date(data.registeredAt.seconds * 1000);
+    registeredAtEl.textContent = registeredDate.toLocaleDateString();
+  }
+  
+  if (user?.metadata?.lastSignInTime) {
+    const lastLoginDate = new Date(user.metadata.lastSignInTime);
+    lastLoginEl.textContent = lastLoginDate.toLocaleDateString();
+  }
+  
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -174,6 +186,7 @@ if (profileImageInput) {
 }
 
 editProfileButton.addEventListener("click", () => toggleEdit(true));
+
 saveProfileButton.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) return;
@@ -194,6 +207,7 @@ saveProfileButton.addEventListener("click", async () => {
 
   const bioVal = editBio.value.trim().slice(0, 200);
   const pronounsVal = editPronouns.value === "Custom" ? customPronounsInput.value.trim() : editPronouns.value;
+  const genderVal = editGender.value === "Other" ? customGenderInput.value.trim() : editGender.value.trim();
 
   if (isNaN(ageVal) || isNaN(weightVal) || isNaN(heightVal)) {
     alert("Please enter valid numbers for age, height, and weight.");
@@ -210,17 +224,22 @@ saveProfileButton.addEventListener("click", async () => {
     bio: bioVal,
     age: ageVal,
     height: heightText,
+    heightInInches: heightUnit.value === "cm" ? null : heightVal,
     weight: `${weightVal} ${weightUnit.value}`,
-    gender: editGender.value.trim(),
+    gender: genderVal,
     pronouns: pronounsVal
   };
 
-  let heightMeters = heightVal;
-  if (heightUnit.value === "cm") heightMeters /= 100;
-  else heightMeters *= 0.0254;
+  let heightMeters;
+  if (heightUnit.value === "cm") {
+    heightMeters = heightVal / 100;
+  } else {
+    heightMeters = updatedData.heightInInches * 0.0254;
+  }
 
   if (heightMeters && weightVal) {
-    updatedData.bmi = (weightVal / (heightMeters * heightMeters)).toFixed(1);
+    const weightKg = weightUnit.value === "lb" ? weightVal * 0.453592 : weightVal;
+    updatedData.bmi = (weightKg / (heightMeters * heightMeters)).toFixed(1);
   }
 
   try {
@@ -266,13 +285,12 @@ function toggleEdit(isEditing) {
 
   heightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
   weightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
-
   customPronounsInput.style.display = isEditing && editPronouns.value === "Custom" ? "block" : "none";
+  customGenderInput.style.display = isEditing && editGender.value === "Other" ? "block" : "none";
 
   editProfileButton.style.display = isEditing ? "none" : "inline-block";
   saveProfileButton.style.display = isEditing ? "inline-block" : "none";
   cancelEditButton.style.display = isEditing ? "inline-block" : "none";
 }
-
 
 

@@ -14,7 +14,6 @@
   <script src="TaskBar.js"></script>
 
   <main>
-    <!-- Profile Header -->
     <section class="profile-header">
       <div>
         <img id="profileImage" src="place-holder-image.jpg" alt="Profile Picture" />
@@ -47,7 +46,6 @@
       </div>
     </section>
 
-    <!-- Stats Section -->
     <section class="stats-section">
       <div class="stat-card">
         <h3>Age</h3>
@@ -61,32 +59,21 @@
 
       <div class="stat-card">
         <h3>Height</h3>
-      
-        <!-- View Mode -->
         <div class="fade-toggle show">
           <p id="height"></p>
         </div>
-      
-        <!-- Edit Mode -->
         <div class="fade-toggle">
-          <!-- Metric input -->
           <input id="editHeightCm" type="number" placeholder="Height in cm" />
-      
-          <!-- Imperial inputs -->
           <div id="editHeightImperial" style="display: none; display: flex; gap: 10px;">
             <input id="editHeightFt" type="number" placeholder="ft" />
             <input id="editHeightIn" type="number" placeholder="in" />
           </div>
-      
-          <!-- Unit selector -->
           <select id="heightUnit">
             <option value="cm">cm</option>
             <option value="ft">ft/in</option>
           </select>
         </div>
       </div>
-      
-      
 
       <div class="stat-card">
         <h3>Weight</h3>
@@ -111,14 +98,20 @@
           <select id="editGender">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
+            <option value="Non-binary">Non-binary</option>
+            <option value="Prefer not to say">Prefer not to say</option>
             <option value="Other">Other</option>
           </select>
+          <input type="text" id="customGender" placeholder="Please specify" style="display: none;" />
         </div>
       </div>
 
       <div class="stat-card">
         <h3>BMI</h3>
-        <p><span id="bmi"></span> <span id="bmiStatus"></span></p>
+        <div class="fade-toggle show">
+          <p><span id="bmi"></span> <span id="bmiStatus" style="font-weight: bold;"></span></p>
+        </div>
+        
       </div>
 
       <div class="stat-card">
@@ -132,14 +125,12 @@
       </div>
     </section>
 
-    <!-- Buttons -->
     <section class="button-container">
       <button id="editProfileButton">Edit Profile</button>
       <button id="saveProfileButton" style="display: none;">Save Changes</button>
       <button id="cancelEditButton" style="display: none;">Cancel</button>
     </section>
 
-    <!-- Dashboard (Unchanged) -->
     <section class="dashboard-section">
       <div class="dashboard-card">
         <h3>Current Goals</h3>
@@ -163,4 +154,5 @@
   <script type="module" src="profile.js"></script>
 </body>
 </html>
+
 
