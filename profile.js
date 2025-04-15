@@ -5,13 +5,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   doc,
-  setDoc,
   updateDoc,
+  getDoc,
   onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const logoutButton = document.getElementById("logoutButton");
 const displayName = document.getElementById("displayName");
 const username = document.getElementById("username");
 const bio = document.getElementById("bio");
@@ -30,12 +29,49 @@ const editProfileButton = document.getElementById("editProfileButton");
 const saveProfileButton = document.getElementById("saveProfileButton");
 const cancelEditButton = document.getElementById("cancelEditButton");
 const editBio = document.getElementById("editBio");
+const bioCharCount = document.getElementById("bioCharCount");
 const editAge = document.getElementById("editAge");
-const editHeight = document.getElementById("editHeight");
 const editWeight = document.getElementById("editWeight");
-const editGender = document.getElementById("editGender");
-const heightUnit = document.getElementById("heightUnit");
 const weightUnit = document.getElementById("weightUnit");
+const editGender = document.getElementById("editGender");
+const customGenderInput = document.getElementById("customGender");
+
+const editHeightCm = document.getElementById("editHeightCm");
+const editHeightFt = document.getElementById("editHeightFt");
+const editHeightIn = document.getElementById("editHeightIn");
+const heightUnit = document.getElementById("heightUnit");
+const imperialHeightFields = document.getElementById("editHeightImperial");
+
+const pronounsDisplay = document.getElementById("pronounsDisplay");
+const editPronouns = document.getElementById("editPronouns");
+const customPronounsInput = document.getElementById("customPronouns");
+
+let originalData = {};
+
+editBio.addEventListener("input", () => {
+  if (editBio.value.length > 200) {
+    editBio.value = editBio.value.substring(0, 200);
+  }
+  bioCharCount.textContent = `${editBio.value.length}/200`;
+});
+
+editPronouns.addEventListener("change", () => {
+  customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
+});
+
+editGender.addEventListener("change", () => {
+  customGenderInput.style.display = editGender.value === "Other" ? "block" : "none";
+});
+
+heightUnit.addEventListener("change", () => {
+  if (heightUnit.value === "cm") {
+    editHeightCm.style.display = "block";
+    imperialHeightFields.style.display = "none";
+  } else {
+    editHeightCm.style.display = "none";
+    imperialHeightFields.style.display = "flex";
+  }
+});
 
 function getHealthStatus(bmi) {
   const value = parseFloat(bmi);
@@ -47,46 +83,66 @@ function getHealthStatus(bmi) {
 }
 
 function updateDOM(data, user) {
-  displayName.textContent = data.displayName;
-  username.textContent = `@${data.username}`;
-  bio.textContent = data.bio || "";
-  age.textContent = data.age;
-  height.textContent = data.height;
-  weight.textContent = data.weight;
-  gender.textContent = data.gender;
-  bmi.textContent = data.bmi;
+  originalData = structuredClone(data);
 
+  displayName.textContent = data.displayName || "—";
+  username.textContent = data.username ? `@${data.username}` : "@—";
+  bio.textContent = data.bio || "—";
+  age.textContent = data.age ?? "—";
+  editAge.value = data.age ?? "";
+  height.textContent = data.height ?? "—";
+  weight.textContent = data.weight ?? "—";
+  gender.textContent = data.gender ?? "—";
+  bmi.textContent = data.bmi ?? "—";
   const status = getHealthStatus(data.bmi);
   bmiStatusEl.textContent = status.label;
   bmiStatusEl.style.color = status.color;
-  bmiStatusEl.style.fontWeight = "bold";
 
-  if (registeredAtEl && data.registeredAt?.toDate) {
-    const friendlyDate = data.registeredAt.toDate().toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
-    registeredAtEl.textContent = friendlyDate;
+
+
+  const pronouns = data.pronouns || "";
+  pronounsDisplay.textContent = pronouns ? `(${pronouns})` : "";
+  editPronouns.value = ["He/Him", "She/Her", "They/Them", "Any Pronouns"].includes(pronouns) ? pronouns : "Custom";
+  customPronounsInput.value = editPronouns.value === "Custom" ? pronouns : "";
+  customPronounsInput.style.display = editPronouns.value === "Custom" ? "block" : "none";
+
+  if (["Male", "Female", "Non-binary", "Prefer not to say"].includes(data.gender)) {
+    editGender.value = data.gender;
+    customGenderInput.style.display = "none";
   } else {
-    registeredAtEl.textContent = "—";
+    editGender.value = "Other";
+    customGenderInput.style.display = "block";
+    customGenderInput.value = data.gender || "";
   }
 
-  if (lastLoginEl && user.metadata?.lastSignInTime) {
-    lastLoginEl.textContent = new Date(user.metadata.lastSignInTime).toLocaleString();
+  const [heightVal, unit] = (data.height || "").split(" ");
+  heightUnit.value = unit || "cm";
+
+  if (unit === "ft") {
+    const feetVal = parseFloat(heightVal);
+    editHeightFt.value = Math.floor(feetVal);
+    editHeightIn.value = Math.round((feetVal - Math.floor(feetVal)) * 12);
+    editHeightCm.style.display = "none";
+    imperialHeightFields.style.display = "flex";
+  } else {
+    editHeightCm.value = heightVal || "";
+    editHeightCm.style.display = "block";
+    imperialHeightFields.style.display = "none";
   }
 
-  if (data.localImageBase64) {
-    profileImage.src = data.localImageBase64;
-  }
-
-  editBio.value = data.bio || "";
-  editAge.value = data.age || "";
-  editHeight.value = data.height?.split(" ")[0] || "";
-  heightUnit.value = data.height?.split(" ")[1] || "cm";
   editWeight.value = data.weight?.split(" ")[0] || "";
   weightUnit.value = data.weight?.split(" ")[1] || "kg";
-  editGender.value = data.gender || "";
+
+  if (data.registeredAt?.seconds) {
+    const registeredDate = new Date(data.registeredAt.seconds * 1000);
+    registeredAtEl.textContent = registeredDate.toLocaleDateString();
+  }
+  
+  if (user?.metadata?.lastSignInTime) {
+    const lastLoginDate = new Date(user.metadata.lastSignInTime);
+    lastLoginEl.textContent = lastLoginDate.toLocaleDateString();
+  }
+  
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -97,12 +153,14 @@ onAuthStateChanged(auth, async (user) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
 
-      // ✅ Patch missing registeredAt timestamp if absent
       if (!data.registeredAt) {
         await updateDoc(docRef, { registeredAt: serverTimestamp() });
+        return;
       }
 
-      updateDOM(data, user);
+      if (saveProfileButton.style.display === "none") {
+        updateDOM(data, user);
+      }
     }
   });
 });
@@ -127,87 +185,112 @@ if (profileImageInput) {
   });
 }
 
-editProfileButton.addEventListener("click", () => {
-  bio.style.display = "none";
-  editBio.style.display = "block";
-  age.style.display = "none";
-  editAge.style.display = "inline-block";
-  height.style.display = "none";
-  editHeight.style.display = "inline-block";
-  heightUnit.style.display = "inline-block";
-  weight.style.display = "none";
-  editWeight.style.display = "inline-block";
-  weightUnit.style.display = "inline-block";
-  gender.style.display = "none";
-  editGender.style.display = "inline-block";
-  editProfileButton.style.display = "none";
-  saveProfileButton.style.display = "inline-block";
-  cancelEditButton.style.display = "inline-block";
-});
+editProfileButton.addEventListener("click", () => toggleEdit(true));
 
-cancelEditButton.addEventListener("click", () => {
-  bio.style.display = "block";
-  editBio.style.display = "none";
-  age.style.display = "block";
-  editAge.style.display = "none";
-  height.style.display = "block";
-  editHeight.style.display = "none";
-  heightUnit.style.display = "none";
-  weight.style.display = "block";
-  editWeight.style.display = "none";
-  weightUnit.style.display = "none";
-  gender.style.display = "block";
-  editGender.style.display = "none";
-  editProfileButton.style.display = "inline-block";
-  saveProfileButton.style.display = "none";
-  cancelEditButton.style.display = "none";
-});
-
-saveProfileButton.addEventListener("click", async (e) => {
-  e.preventDefault();
+saveProfileButton.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) return;
 
-  const userDocRef = doc(db, "profile", user.uid);
-  let height = parseFloat(editHeight.value);
-  let weight = parseFloat(editWeight.value);
+  const ageVal = parseInt(editAge.value);
+  const weightVal = parseFloat(editWeight.value);
+  let heightVal, heightText;
 
-  if (heightUnit.value === "cm") height /= 100;
-  else if (heightUnit.value === "in") height *= 0.0254;
-  else if (heightUnit.value === "ft") height *= 0.3048;
+  if (heightUnit.value === "cm") {
+    heightVal = parseFloat(editHeightCm.value);
+    heightText = `${heightVal} cm`;
+  } else {
+    const ft = parseFloat(editHeightFt.value) || 0;
+    const inches = parseFloat(editHeightIn.value) || 0;
+    heightVal = (ft * 12) + inches;
+    heightText = `${(heightVal / 12).toFixed(2)} ft`;
+  }
 
-  if (weightUnit.value === "lb") weight *= 0.453592;
+  const bioVal = editBio.value.trim().slice(0, 200);
+  const pronounsVal = editPronouns.value === "Custom" ? customPronounsInput.value.trim() : editPronouns.value;
+  const genderVal = editGender.value === "Other" ? customGenderInput.value.trim() : editGender.value.trim();
 
-  const bmiValue = weight / (height * height);
-  const roundedBmi = parseFloat(bmiValue.toFixed(1));
+  if (isNaN(ageVal) || isNaN(weightVal) || isNaN(heightVal)) {
+    alert("Please enter valid numbers for age, height, and weight.");
+    return;
+  }
+
+  const docRef = doc(db, "profile", user.uid);
+  const currentSnap = await getDoc(docRef);
+  const currentData = currentSnap.exists() ? currentSnap.data() : {};
 
   const updatedData = {
-    bio: editBio.value,
-    age: parseInt(editAge.value, 10),
-    height: `${editHeight.value} ${heightUnit.value}`,
-    weight: `${editWeight.value} ${weightUnit.value}`,
-    gender: editGender.value,
-    bmi: roundedBmi
+    displayName: currentData.displayName || user.displayName || "—",
+    username: currentData.username || user.email?.split("@")[0] || "—",
+    bio: bioVal,
+    age: ageVal,
+    height: heightText,
+    heightInInches: heightUnit.value === "cm" ? null : heightVal,
+    weight: `${weightVal} ${weightUnit.value}`,
+    gender: genderVal,
+    pronouns: pronounsVal
   };
 
+  let heightMeters;
+  if (heightUnit.value === "cm") {
+    heightMeters = heightVal / 100;
+  } else {
+    heightMeters = updatedData.heightInInches * 0.0254;
+  }
+
+  if (heightMeters && weightVal) {
+    const weightKg = weightUnit.value === "lb" ? weightVal * 0.453592 : weightVal;
+    updatedData.bmi = (weightKg / (heightMeters * heightMeters)).toFixed(1);
+  }
+
   try {
-    await setDoc(userDocRef, updatedData, { merge: true });
-    alert("Profile updated successfully!");
-    cancelEditButton.click();
+    await updateDoc(docRef, updatedData);
+    updateDOM(updatedData, user);
+    toggleEdit(false);
   } catch (err) {
-    console.error("Error updating profile:", err);
+    console.error("Error saving:", err);
+    alert("Failed to save profile. Try again.");
   }
 });
 
-logoutButton.addEventListener("click", () => {
-  signOut(auth)
-    .then(() => {
-      alert("Logged out successfully!");
-      window.location.href = "sign-in.html";
-    })
-    .catch((error) => {
-      console.error("Error logging out:", error);
-    });
+cancelEditButton.addEventListener("click", () => {
+  updateDOM(originalData, auth.currentUser);
+  toggleEdit(false);
 });
+
+function toggleEdit(isEditing) {
+  const togglePair = (staticEl, editEl) => {
+    staticEl.parentElement.classList.toggle("show", !isEditing);
+    editEl.parentElement.classList.toggle("show", isEditing);
+  };
+
+  togglePair(bio, editBio);
+  togglePair(age, editAge);
+  togglePair(weight, editWeight);
+  togglePair(gender, editGender);
+  togglePair(pronounsDisplay, editPronouns);
+
+  const heightDisplay = height.closest(".fade-toggle");
+  const heightEdit = editHeightCm.closest(".fade-toggle");
+  if (heightDisplay && heightEdit) {
+    heightDisplay.classList.toggle("show", !isEditing);
+    heightEdit.classList.toggle("show", isEditing);
+  }
+
+  const weightDisplay = weight.closest(".fade-toggle");
+  const weightEdit = editWeight.closest(".fade-toggle");
+  if (weightDisplay && weightEdit) {
+    weightDisplay.classList.toggle("show", !isEditing);
+    weightEdit.classList.toggle("show", isEditing);
+  }
+
+  heightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
+  weightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
+  customPronounsInput.style.display = isEditing && editPronouns.value === "Custom" ? "block" : "none";
+  customGenderInput.style.display = isEditing && editGender.value === "Other" ? "block" : "none";
+
+  editProfileButton.style.display = isEditing ? "none" : "inline-block";
+  saveProfileButton.style.display = isEditing ? "inline-block" : "none";
+  cancelEditButton.style.display = isEditing ? "inline-block" : "none";
+}
 
 

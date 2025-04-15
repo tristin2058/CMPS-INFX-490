@@ -5,24 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profile</title>
   <link rel="stylesheet" href="profile.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module" src="chatbot-ui.js"></script>
 </head>
 <body>
-  
-  <script src="taskbar.js"></script>
+  <script src="TaskBar.js"></script>
 
   <main>
-    <!-- Profile Picture and Basic Info -->
+    <!-- Profile Header -->
     <section class="profile-header">
       <div>
         <img id="profileImage" src="place-holder-image.jpg" alt="Profile Picture" />
         <input type="file" id="profileImageInput" />
       </div>
-      <div>
-        <h2 id="displayName">Display Name</h2>
-        <p id="username">@username</p>
-        <div>
-          <p id="bio">User bio goes here</p>
-          <textarea id="editBio" style="display: none;"></textarea>
+      <div class="profile-text">
+        <h2 id="displayName"></h2>
+        <p id="username"></p>
+        <p id="pronounsDisplay" class="fade-toggle show"></p>
+
+        <div class="fade-toggle show">
+          <p id="bio"></p>
+        </div>
+        <div class="fade-toggle">
+          <textarea id="editBio"></textarea>
+          <small id="bioCharCount">0/200</small>
+        </div>
+
+        <div class="fade-toggle">
+          <select id="editPronouns">
+            <option value="">—</option>
+            <option value="He/Him">He/Him</option>
+            <option value="She/Her">She/Her</option>
+            <option value="They/Them">They/Them</option>
+            <option value="Any Pronouns">Any Pronouns</option>
+            <option value="Custom">Custom</option>
+          </select>
+          <input type="text" id="customPronouns" placeholder="Enter custom pronouns" style="display: none;" />
         </div>
       </div>
     </section>
@@ -31,55 +51,95 @@
     <section class="stats-section">
       <div class="stat-card">
         <h3>Age</h3>
-        <p id="age"></p>
-        <input id="editAge" type="number" style="display: none;" />
+        <div class="fade-toggle show">
+          <p id="age"></p>
+        </div>
+        <div class="fade-toggle">
+          <input id="editAge" type="number" />
+        </div>
       </div>
+
       <div class="stat-card">
         <h3>Height</h3>
-        <p id="height"></p>
-        <input id="editHeight" type="text" style="display: none;" />
-        <select id="heightUnit" style="display: none;">
-          <option value="cm">cm</option>
-          <option value="in">in</option>
-          <option value="ft">ft</option>
-        </select>
+      
+        <!-- View Mode -->
+        <div class="fade-toggle show">
+          <p id="height"></p>
+        </div>
+      
+        <!-- Edit Mode -->
+        <div class="fade-toggle">
+          <!-- Metric input -->
+          <input id="editHeightCm" type="number" placeholder="Height in cm" />
+      
+          <!-- Imperial inputs -->
+          <div id="editHeightImperial" style="display: none; display: flex; gap: 10px;">
+            <input id="editHeightFt" type="number" placeholder="ft" />
+            <input id="editHeightIn" type="number" placeholder="in" />
+          </div>
+      
+          <!-- Unit selector -->
+          <select id="heightUnit">
+            <option value="cm">cm</option>
+            <option value="ft">ft/in</option>
+          </select>
+        </div>
       </div>
+      
+      
+
       <div class="stat-card">
         <h3>Weight</h3>
-        <p id="weight"></p>
-        <input id="editWeight" type="number" style="display: none;" />
-        <select id="weightUnit" style="display: none;">
-          <option value="kg">kg</option>
-          <option value="lb">lb</option>
-        </select>
+        <div class="fade-toggle show">
+          <p id="weight"></p>
+        </div>
+        <div class="fade-toggle">
+          <input id="editWeight" type="number" />
+          <select id="weightUnit">
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+          </select>
+        </div>
       </div>
+
       <div class="stat-card">
         <h3>Gender</h3>
-        <p id="gender"></p>
-        <input id="editGender" type="text" style="display: none;" />
+        <div class="fade-toggle show">
+          <p id="gender"></p>
+        </div>
+        <div class="fade-toggle">
+          <select id="editGender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
       </div>
+
       <div class="stat-card">
         <h3>BMI</h3>
         <p><span id="bmi"></span> <span id="bmiStatus"></span></p>
       </div>
+
       <div class="stat-card">
         <h3>Member Since</h3>
         <p id="registeredAt">—</p>
       </div>
+
       <div class="stat-card">
         <h3>Last Login</h3>
         <p id="lastLogin">—</p>
       </div>
     </section>
 
-    <!-- Action Buttons -->
-    <section>
+    <!-- Buttons -->
+    <section class="button-container">
       <button id="editProfileButton">Edit Profile</button>
       <button id="saveProfileButton" style="display: none;">Save Changes</button>
       <button id="cancelEditButton" style="display: none;">Cancel</button>
     </section>
 
-    <!-- Dashboard Style Cards -->
+    <!-- Dashboard (Unchanged) -->
     <section class="dashboard-section">
       <div class="dashboard-card">
         <h3>Current Goals</h3>
@@ -101,17 +161,6 @@
   </main>
 
   <script type="module" src="profile.js"></script>
-  <script>
-    function logout() {
-      import('./firebase-config.js').then(({ auth }) => {
-        import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js').then(({ signOut }) => {
-          signOut(auth).then(() => {
-            alert('Logged out successfully!');
-            window.location.href = 'sign-in.html';
-          });
-        });
-      });
-    }
-  </script>
 </body>
 </html>
+

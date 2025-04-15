@@ -5,16 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exercise Logging</title>
     <link rel="stylesheet" href="exercise-logging.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module" src="chatbot-ui.js"></script>
 </head>
 <body>
+    <!-- Logo as a button to navigate to the dashboard -->
+    <button class="logo-btn" onclick="location.href='dashboard.html'">
+        <img src="360_transparent.png" alt="Logo">
+    </button>
     <script src="TaskBar.js"></script>
     <div class="layout">
         <!-- Main Content -->
         <main class="main-content">
             <header class="main-header">
                 <h1>Exercise Log</h1>
-                <button id="profileButton" class="profile-btn"><i class="fas fa-user-circle"></i></button>
             </header>
 
             <!-- Log Your Exercise and Exercise Lookup Sections -->
@@ -71,43 +77,6 @@
                             <!-- Fetched exercises will be displayed here -->
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Exercise Overview Section -->
-            <section class="overview">
-                <h2>Exercise Overview</h2>
-                <h3>Today's Most Recent Exercise</h3> <!-- Added text -->
-                
-                <div class="metrics">
-                    <!-- Cardio Section -->
-                    <div class="metric-card">
-                        <h3>Cardio Type</h3> <!-- Added heading for cardio type -->
-                        <p id="cardioTypeDisplay">None</p> <!-- Added element to display cardio type -->
-                    </div>
-                    <div class="metric-card">
-                        <h3>Distance</h3>
-                        <p id="cardioDistanceDisplay">0 km</p>
-                    </div>
-                    
-                    <!-- Workouts Section -->
-                    <div class="metric-card">
-                        <h3>Workout Type</h3> <!-- Added heading for workout type -->
-                        <p id="workoutTypeDisplay">None</p> <!-- Added element to display workout type -->
-                    </div>
-                    <div class="metric-card">
-                        <h3>Reps</h3>
-                        <p id="workoutRepsDisplay">0</p>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Sets</h3>
-                        <p id="workoutSetsDisplay">0</p>
-                    </div>
-                </div>
-                <h3>History</h3> <!-- Added text for history section -->
-                <!-- Exercise List -->
-                <div id="exerciseList">
-                    <!-- List of exercises will be displayed here -->
                 </div>
             </section>
         </main>

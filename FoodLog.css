@@ -1,9 +1,9 @@
 /* General Styles */
 body {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-    color: white;
+    color: #ffffff;
     min-height: 100vh;
     padding: 0;
     box-sizing: border-box;
@@ -114,10 +114,28 @@ button:hover {
     font-weight: bold;
 }
 
+.logo-btn {
+    position: absolute;
+    top: 0px; /* Adjust height */
+    left: 0px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: block;
+    z-index: 100; /* Ensures button is visible */
+    /* Ensures it appears above other elements */
+}
+.logo-btn img {
+    width: 70px; /* Slightly larger */
+    height: 70px;
+    display: block; /* Ensures image renders */
+}
+
 /* Highlight Logged Days */
 .logged {
     background-color: rgba(255, 255, 255, 0.3);
-}
+
 
 .taskbar {
     position: fixed;
@@ -171,6 +189,4 @@ button:hover {
     align-items: center;
     height: 100%;
 }
-
-
-  
+}
