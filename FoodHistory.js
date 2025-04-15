@@ -11,10 +11,10 @@ import {
 const foodTableBody = document.getElementById("foodTableBody");
 
 // Function to load and display food history
-const loadFoodHistory = async (uid) => {
+const loadFoodHistory = async (uid, date) => {
     try {
         // Reference to the Food History collection
-        const foodQuery = collection(db, `Food Log/User's Food/${uid}/Entries`);
+        const foodQuery = collection(db, `Food Log/${uid}/Entries`);
 
         // Fetch data from the collection
         const foodSnapshot = await getDocs(foodQuery);
@@ -26,9 +26,10 @@ const loadFoodHistory = async (uid) => {
             const data = doc.data();
             const row = document.createElement("tr");
 
+            // Use the correct field names from Firestore
             row.innerHTML = `
-                <td>${data.date}</td>
-                <td>${data.foodEntry}</td>
+                <td>${doc.id}</td> <!-- Use the document ID as the date -->
+                <td>${data.meals || "No meals recorded"}</td>
             `;
 
             foodTableBody.appendChild(row);

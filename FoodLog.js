@@ -6,7 +6,9 @@ import {
 import {
     doc,
     setDoc,
-    getDoc
+    getDoc,
+    collection,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -40,6 +42,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    async function getMealHistoryFromLocalStorage(userId) {
+        const storedHistory = JSON.parse(localStorage.getItem(userId)) || {};
+        return storedHistory;
+    }
+
+    async function saveMealHistoryToLocalStorage(userId, mealHistory) {
+        localStorage.setItem(userId, JSON.stringify(mealHistory));
+    }
+
     function handleManualEntry(foodName, calories) {
         return `<strong>${foodName}</strong> - Manual entry - ${calories} kcal`;
     }
@@ -70,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function saveToFirestore(userId, date, data) {
         try {
-            const userDocRef = doc(db, "users", userId, "mealLogs", date);
+            const userDocRef = doc(db, `Food Log/${userId}/Entries`, date); // Use the date as the document ID
             await setDoc(userDocRef, data);
             console.log("Data saved to Firestore:", data);
         } catch (error) {
@@ -80,33 +91,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function getMealHistoryFromFirestore(userId) {
         try {
-            const userDocRef = doc(db, "users", userId, "mealLogs", selectedDate);
-            const docSnap = await getDoc(userDocRef);
-            if (docSnap.exists()) {
-                return docSnap.data();
-            } else {
-                return null;
-            }
+            const entriesCollection = collection(db, `Food Log/${userId}/Entries`);
+            const querySnapshot = await getDocs(entriesCollection);
+
+            const history = {};
+            querySnapshot.forEach((doc) => {
+                history[doc.id] = doc.data(); // Use the document ID (date) as the key
+            });
+
+            return history;
         } catch (error) {
             console.error("Error fetching from Firestore:", error);
             return null;
         }
     }
 
-    async function getMealHistoryFromLocalStorage(userId) {
-        const storedHistory = JSON.parse(localStorage.getItem(userId)) || {};
-        return storedHistory;
-    }
-
-    async function saveMealHistoryToLocalStorage(userId, mealHistory) {
-        localStorage.setItem(userId, JSON.stringify(mealHistory));
-    }
-
     // This will handle saving meal data to localStorage and Firestore
     async function handleMealHistory(user, date, entry) {
         const userUid = user ? user.uid : null;
         if (userUid) {
-            // Get the current history from localStorage
+            // Get the current history from LocalStorage
             const storedHistory = await getMealHistoryFromLocalStorage(userUid);
 
             // Add the new entry for the selected date
@@ -126,8 +130,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const userId = user.uid;
             console.log("User logged in:", userId);
 
-            // Load all past meal entries from localStorage
-            mealHistory = await getMealHistoryFromLocalStorage(userId);
+            // Load all past meal entries from Firestore
+            const firestoreHistory = await getMealHistoryFromFirestore(userId);
+            if (firestoreHistory) {
+                mealHistory = firestoreHistory; // Populate mealHistory with Firestore data
+            }
+
             updateMealHistory();
             renderCalendar();
         } else {
