@@ -9,7 +9,8 @@ import {
     getDoc,
     setDoc,
     getDocs,
-    addDoc
+    addDoc,
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Select input fields and buttons
@@ -17,14 +18,6 @@ const exerciseTypeSelect = document.getElementById("exerciseType");
 const dynamicInputs = document.getElementById("dynamicInputs");
 const saveExerciseButton = document.querySelector(".btn-save-exercise");
 const undoExerciseButton = document.querySelector(".btn-undo-exercise");
-
-// Display elements
-const cardioTypeDisplay = document.getElementById("cardioTypeDisplay");
-const cardioDistanceDisplay = document.getElementById("cardioDistanceDisplay");
-const workoutTypeDisplay = document.getElementById("workoutTypeDisplay");
-const workoutRepsDisplay = document.getElementById("workoutRepsDisplay");
-const workoutSetsDisplay = document.getElementById("workoutSetsDisplay");
-const exerciseList = document.getElementById("exerciseList");
 
 // Profile and logout elements
 const profileNav = document.getElementById("profileNav");
@@ -47,69 +40,10 @@ const loadExerciseData = async () => {
 
     if (userSnap.exists()) {
         const data = userSnap.data();
-        
-        // Display the stored values (use default 0 if missing)
-        if (exerciseType === "Cardio") {
-            cardioTypeDisplay.textContent = data.exercise || "None";
-            cardioDistanceDisplay.textContent = `${data.duration || 0} km`;
-        } else if (exerciseType === "Workouts") {
-            workoutTypeDisplay.textContent = data.exercise || "None";
-            workoutRepsDisplay.textContent = data.reps || 0;
-            workoutSetsDisplay.textContent = data.sets || 0;
-        }
 
         // Save the current state for undo functionality
         previousExerciseState = { ...data };
     }
-
-    // Load and display historical exercise data
-    loadExerciseHistory(user.uid);
-};
-
-const formattedDate = new Date().toISOString();
-
-// Function to load and display historical exercise data for both Cardio and Workouts
-const loadExerciseHistory = async (uid) => {
-    const cardioQuery = collection(db, `Exercise Log/Cardio/User's Exercise/${uid}/Exercises`);
-    const workoutsQuery = collection(db, `Exercise Log/Workouts/User's Exercise/${uid}/Exercises`);
-
-    const [cardioSnapshot, workoutsSnapshot] = await Promise.all([
-        getDocs(cardioQuery),
-        getDocs(workoutsQuery)
-    ]);
-
-    exerciseList.innerHTML = ""; // Clear existing exercises
-
-    // Display Cardio exercises
-    cardioSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const exerciseItem = document.createElement("div");
-        exerciseItem.classList.add("exercise-item");
-
-        exerciseItem.innerHTML = `
-            <h3>${new Date(data.date).toLocaleString()}</h3>
-            <p>Type of Cardio: ${data.exercise}</p>
-            <p>Distance: ${data.duration} km</p>
-        `;
-
-        exerciseList.appendChild(exerciseItem);
-    });
-
-    // Display Workouts exercises
-    workoutsSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const exerciseItem = document.createElement("div");
-        exerciseItem.classList.add("exercise-item");
-
-        exerciseItem.innerHTML = `
-            <h3>${new Date(data.date).toLocaleString()}</h3>
-            <p>Type of Workout: ${data.exercise}</p>
-            <p>Reps: ${data.reps}</p>
-            <p>Sets: ${data.sets}</p>
-        `;
-
-        exerciseList.appendChild(exerciseItem);
-    });
 };
 
 // Function to save and update exercise data
@@ -187,16 +121,6 @@ const saveExerciseData = async () => {
 
         alert("Exercise data updated successfully!");
 
-        // Update the displayed values
-        if (exerciseType === "Cardio") {
-            cardioTypeDisplay.textContent = newExercise;
-            cardioDistanceDisplay.textContent = `${updatedData.duration} km`;
-        } else if (exerciseType === "Workouts") {
-            workoutTypeDisplay.textContent = newExercise;
-            workoutRepsDisplay.textContent = updatedData.reps;
-            workoutSetsDisplay.textContent = updatedData.sets;
-        }
-
         // Show the undo button
         undoExerciseButton.style.display = "inline-block";
 
@@ -205,9 +129,6 @@ const saveExerciseData = async () => {
         if (document.getElementById("duration")) document.getElementById("duration").value = "";
         if (document.getElementById("reps")) document.getElementById("reps").value = "";
         if (document.getElementById("sets")) document.getElementById("sets").value = "";
-
-        // Reload exercise history
-        loadExerciseHistory(user.uid);
 
     } catch (error) {
         console.error("Error saving exercise data: ", error);
@@ -223,28 +144,43 @@ const undoLastExerciseEntry = async () => {
         return;
     }
 
+    if (!confirm("Are you sure you want to undo the last exercise entry?")) {
+        return;
+    }
+
     const exerciseType = exerciseTypeSelect.value;
-    const userDocRef = doc(db, `Exercise_Log/${exerciseType}/User's_Exercise`, user.uid); // Use UID as document ID
+    const formattedDate = new Date().toISOString(); // Use the current date for reference
+    const exerciseHistoryCollection = collection(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`);
 
     try {
-        // Restore the previous state
-        await setDoc(userDocRef, previousExerciseState, { merge: true });
-
-        alert("Last exercise entry undone successfully!");
-
-        // Update the displayed values
-        if (exerciseType === "Cardio") {
-            cardioTypeDisplay.textContent = previousExerciseState.exercise || "None";
-            cardioDistanceDisplay.textContent = `${previousExerciseState.duration || 0} km`;
-        } else if (exerciseType === "Workouts") {
-            workoutTypeDisplay.textContent = previousExerciseState.exercise || "None";
-            workoutRepsDisplay.textContent = previousExerciseState.reps || 0;
-            workoutSetsDisplay.textContent = previousExerciseState.sets || 0;
+        // Fetch the most recent entry
+        const querySnapshot = await getDocs(exerciseHistoryCollection);
+        if (querySnapshot.empty) {
+            alert("No entries to undo.");
+            return;
         }
 
-        // Hide the undo button
-        undoExerciseButton.style.display = "none";
+        // Find the most recent entry
+        let mostRecentDoc = null;
+        querySnapshot.forEach((doc) => {
+            if (!mostRecentDoc || doc.id > mostRecentDoc.id) {
+                mostRecentDoc = doc;
+            }
+        });
 
+        if (mostRecentDoc) {
+            // Delete the most recent entry
+            const mostRecentDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, mostRecentDoc.id);
+            await deleteDoc(mostRecentDocRef);
+
+            alert("Last exercise entry undone successfully!");
+
+            // Hide the undo button
+            undoExerciseButton.style.display = "none";
+
+        } else {
+            alert("No entries to undo.");
+        }
     } catch (error) {
         console.error("Error undoing last exercise entry: ", error);
         alert("Failed to undo last exercise entry.");

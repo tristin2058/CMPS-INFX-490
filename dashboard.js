@@ -1,3 +1,34 @@
+// Initialize Settings
+let userSettings = {
+    unitSystem: 'imperial',
+    goals: {
+        steps: 10000,
+        calories: 2000,
+        water: 8
+    }
+};
+
+// Sample data - in a real app, this would come from a database or API
+const userData = {
+    steps: 7500,
+    stepGoal: 10000,
+    distance: 3.2, // miles
+    activeMinutes: 45,
+    caloriesConsumed: 1850,
+    calorieGoal: 2000,
+    protein: 120,
+    carbs: 210,
+    fat: 65,
+    currentWeight: 165.4,
+    weightHistory: [168, 167.2, 166.5, 166, 165.8, 165.5, 165.4],
+    sleepDuration: 7.5,
+    sleepQuality: 85,
+    totalCaloriesBurned: 520,
+    exerciseCalories: 320,
+    waterGlasses: 5,
+    weeklyActivity: [7500, 8200, 6000, 9100, 10500, 7800, 6500] // steps for each day of the week
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Set current date
     const currentDate = new Date();
@@ -7,27 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         month: 'long', 
         day: 'numeric' 
     });
-
-    // Sample data - in a real app, this would come from a database or API
-    const userData = {
-        steps: 7500,
-        stepGoal: 10000,
-        distance: 3.2, // miles
-        activeMinutes: 45,
-        caloriesConsumed: 1850,
-        calorieGoal: 2000,
-        protein: 120,
-        carbs: 210,
-        fat: 65,
-        currentWeight: 165.4,
-        weightHistory: [168, 167.2, 166.5, 166, 165.8, 165.5, 165.4],
-        sleepDuration: 7.5,
-        sleepQuality: 85,
-        totalCaloriesBurned: 520,
-        exerciseCalories: 320,
-        waterGlasses: 5,
-        weeklyActivity: [7500, 8200, 6000, 9100, 10500, 7800, 6500] // steps for each day of the week
-    };
 
     // Update metrics with user data
     updateMetrics(userData);
@@ -41,32 +51,64 @@ document.addEventListener('DOMContentLoaded', function() {
     // Weight modal functionality
     setupWeightModal();
 
+    // Settings modal functionality
+    setupSettingsModal();
+
     // Quick action buttons (placeholder functionality)
-    document.querySelectorAll('.action-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            alert(`${this.querySelector('span').textContent} functionality would be implemented here.`);
-        });
+    document.querySelectorAll('.action-btn').forEach((btn, index) => {
+        if (index === 0) { // Log Meal button
+            btn.addEventListener('click', function() {
+                window.location.href = 'FoodLog.html';
+            });
+        } 
+        else if (index === 1) { // Start Workout button
+            btn.addEventListener('click', function() {
+                window.location.href = 'exercise-logging.html';
+            });
+        }
+        else if (index === 2) { // Log Sleep button (keep placeholder)
+            btn.addEventListener('click', function() {
+                alert('Log Sleep functionality would be implemented here.');
+            });
+        }
+        // Settings button (index 3) is already handled by setupSettingsModal()
     });
 });
 
 function updateMetrics(data) {
+    // Convert weight if needed
+    const weightValue = userSettings.unitSystem === 'metric' ? 
+        (data.currentWeight * 0.453592).toFixed(1) : 
+        data.currentWeight.toFixed(1);
+    const weightUnit = userSettings.unitSystem === 'metric' ? 'kg' : 'lbs';
+    
+    // Convert distance if needed
+    const distanceValue = userSettings.unitSystem === 'metric' ? 
+        (data.distance * 1.60934).toFixed(1) : 
+        data.distance.toFixed(1);
+    const distanceUnit = userSettings.unitSystem === 'metric' ? 'km' : 'miles';
+
     // Steps and activity
-    const stepsPercent = (data.steps / data.stepGoal) * 100;
+    const stepsPercent = (data.steps / userSettings.goals.steps) * 100;
     document.getElementById('steps-progress').style.width = `${Math.min(stepsPercent, 100)}%`;
-    document.getElementById('steps-text').textContent = `${data.steps.toLocaleString()}/${data.stepGoal.toLocaleString()}`;
-    document.getElementById('distance').textContent = data.distance.toFixed(1);
+    document.getElementById('steps-text').textContent = 
+        `${data.steps.toLocaleString()}/${userSettings.goals.steps.toLocaleString()}`;
+    document.getElementById('distance').textContent = distanceValue;
+    document.getElementById('distance').nextElementSibling.textContent = distanceUnit;
     document.getElementById('active-time').textContent = data.activeMinutes;
 
     // Nutrition
-    const caloriesPercent = (data.caloriesConsumed / data.calorieGoal) * 100;
+    const caloriesPercent = (data.caloriesConsumed / userSettings.goals.calories) * 100;
     document.getElementById('calories-progress').style.width = `${Math.min(caloriesPercent, 100)}%`;
-    document.getElementById('calories-text').textContent = `${data.caloriesConsumed}/${data.calorieGoal}`;
+    document.getElementById('calories-text').textContent = 
+        `${data.caloriesConsumed}/${userSettings.goals.calories}`;
     document.getElementById('protein').textContent = data.protein;
     document.getElementById('carbs').textContent = data.carbs;
     document.getElementById('fat').textContent = data.fat;
 
     // Weight
-    document.getElementById('current-weight').textContent = data.currentWeight.toFixed(1);
+    document.getElementById('current-weight').textContent = weightValue;
+    document.querySelector('.weight-unit').textContent = weightUnit;
     if (data.weightHistory.length > 1) {
         const weightChange = data.currentWeight - data.weightHistory[data.weightHistory.length - 2];
         const changeElement = document.getElementById('weight-change-amount');
@@ -235,7 +277,7 @@ function setupWaterIntake(initialGlasses) {
     
     // Add water button functionality
     addWaterBtn.addEventListener('click', function() {
-        if (currentGlasses < 8) {
+        if (currentGlasses < userSettings.goals.water) {
             currentGlasses++;
             updateWaterDisplay();
         } else {
@@ -252,10 +294,16 @@ function setupWaterIntake(initialGlasses) {
     });
     
     function updateWaterDisplay() {
+        // Only show the number of glasses needed for the goal
         glasses.forEach((glass, index) => {
-            glass.dataset.filled = index < currentGlasses;
+            if (index < userSettings.goals.water) {
+                glass.style.display = 'block';
+                glass.dataset.filled = index < currentGlasses;
+            } else {
+                glass.style.display = 'none';
+            }
         });
-        waterText.textContent = `${currentGlasses}/8 glasses`;
+        waterText.textContent = `${currentGlasses}/${userSettings.goals.water} glasses`;
     }
 }
 
@@ -283,12 +331,68 @@ function setupWeightModal() {
     submitBtn.addEventListener('click', function() {
         const newWeight = parseFloat(weightInput.value);
         if (!isNaN(newWeight)) {
-            // In a real app, you would save this to your database
-            alert(`Weight logged: ${newWeight} lbs. In a real app, this would update your data.`);
+            // Update the user data
+            userData.currentWeight = newWeight;
+            userData.weightHistory.unshift(newWeight); // Add to beginning of array
+            
+            // Update the display
+            updateMetrics(userData);
+            
+            // Close modal and reset
             modal.style.display = 'none';
             weightInput.value = '';
+            
+            // In a real app, you would save this to your database
+            alert(`Weight logged: ${newWeight} ${userSettings.unitSystem === 'metric' ? 'kg' : 'lbs'}`);
         } else {
             alert('Please enter a valid weight');
+        }
+    });
+}
+
+function setupSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    const settingsBtn = document.querySelector('.action-btn:nth-child(4)'); // Settings button
+    const closeBtn = modal.querySelector('.close-btn');
+    const saveBtn = document.getElementById('save-settings-btn');
+
+    // Initialize form with current settings
+    document.querySelector(`input[name="unit-system"][value="${userSettings.unitSystem}"]`).checked = true;
+    document.getElementById('step-goal').value = userSettings.goals.steps;
+    document.getElementById('calorie-goal').value = userSettings.goals.calories;
+    document.getElementById('water-goal').value = userSettings.goals.water;
+
+    // Open settings modal
+    settingsBtn.addEventListener('click', function() {
+        modal.style.display = 'flex';
+    });
+    
+    // Close settings modal
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    // Save settings
+    saveBtn.addEventListener('click', function() {
+        // Update settings
+        userSettings.unitSystem = document.querySelector('input[name="unit-system"]:checked').value;
+        userSettings.goals.steps = parseInt(document.getElementById('step-goal').value) || 10000;
+        userSettings.goals.calories = parseInt(document.getElementById('calorie-goal').value) || 2000;
+        userSettings.goals.water = parseInt(document.getElementById('water-goal').value) || 8;
+        
+        // Update UI with new settings
+        updateMetrics(userData);
+        setupWaterIntake(userData.waterGlasses);
+
+        // In a real app, you would save these settings to your database
+        alert('Settings saved!');
+        modal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
         }
     });
 }
