@@ -185,7 +185,10 @@ if (profileImageInput) {
   });
 }
 
-editProfileButton.addEventListener("click", () => toggleEdit(true));
+editProfileButton.addEventListener("click", () => {
+  console.log("Edit button clicked");
+  toggleEdit(true);
+});
 
 saveProfileButton.addEventListener("click", async () => {
   const user = auth.currentUser;
