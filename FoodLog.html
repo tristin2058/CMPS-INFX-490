@@ -1,40 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Log</title>
-    <link rel="stylesheet" href="FoodLog.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script type="module" src="chatbot-ui.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Food Log</title>
+  <link rel="stylesheet" href="FoodLog.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module" src="chatbot-ui.js"></script>
 </head>
 <body>
-    <script src="TaskBar.js"></script>
+  <script src="TaskBar.js"></script>
 
-    <div class="container">
-        <div class="history-tracker">
-            <h2>Calendar</h2>
-            <div id="calendar-month"></div> <!-- Calendar month header -->
-            <div class="calendar"></div>
-        </div>
-        <div class="meal-entries">
-            <h2>Meal Entries</h2>
-            <textarea id="breakfast" placeholder="Breakfast (max 5 entries) ex: eggs - 100"></textarea>
-            <textarea id="lunch" placeholder="Lunch (max 5 entries) ex: burger - 300"></textarea>
-            <textarea id="dinner" placeholder="Dinner (max 5 entries) ex steak - 450"></textarea>
-            <button id="submit-meals-button">Submit Meals</button>
-        </div>
-        <div class="daily-summary">
-            <h2>Daily Summary</h2>
-            <p id="summaryDisplay">Enter your meals to see the summary.</p>
-        </div>
-        <div class="history-log">
-            <h2>Meal History</h2>
-            <p id="mealHistory">Enter meals to see the history.</p>
-        </div>
+  <div class="container">
+    <div class="history-tracker">
+      <h2>Calendar</h2>
+      <div id="calendar-month"></div>
+      <div class="calendar"></div>
     </div>
 
-    <script src="FoodLog.js"></script>
+    <div class="meal-entries">
+      <h2>Meal Entries</h2>
+      <textarea id="breakfast" placeholder="Breakfast (max 5 entries) ex: eggs - 100"></textarea>
+      <textarea id="lunch" placeholder="Lunch (max 5 entries) ex: burger - 300"></textarea>
+      <textarea id="dinner" placeholder="Dinner (max 5 entries) ex steak - 450"></textarea>
+      <button id="submit-meals-button">Submit Meals</button>
+    </div>
+
+    <div class="daily-summary">
+      <h2>Daily Summary</h2>
+      <p id="summaryDisplay">Enter your meals to see the summary.</p>
+    </div>
+
+    <div class="history-log">
+      <h2>Meal History</h2>
+      <p id="mealHistory">Enter meals to see the history.</p>
+    </div>
+  </div>
+  <script type="module" src="FoodLog.js"></script>
 </body>
 </html>

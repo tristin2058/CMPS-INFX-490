@@ -1,15 +1,28 @@
+import { auth, db } from "./firebase-config.js";
+import {
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", () => {
     const submitMealsButton = document.querySelector("#submit-meals-button");
     const historyLog = document.querySelector("#mealHistory");
     const calorieTotalDisplay = document.getElementById("calories-consumed");
-    const dailySummaryDisplay = document.getElementById("summaryDisplay");
+    const dailySummaryDisplay = document.querySelector("#summaryDisplay");
     const mealEntryInputs = document.querySelectorAll("textarea");
     const calendarContainer = document.querySelector(".calendar");
-    const calendarMonth = document.querySelector("#calendar-month"); // For month display
+    const calendarMonth = document.querySelector("#calendar-month");
 
     let totalCalories = 0;
     let selectedDate = getFormattedDate(new Date());
-    let mealHistory = JSON.parse(localStorage.getItem("mealHistory")) || {};
+    let mealHistory = {}; // Stores meals for the current session
 
     const USDA_API_KEY = "TlJi5aBkuJ2ur7CEppmSTrKsCKCdNftjRWJhLrd5";
     const USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search";
@@ -29,20 +42,106 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    async function getMealHistoryFromLocalStorage(userId) {
+        const storedHistory = JSON.parse(localStorage.getItem(userId)) || {};
+        return storedHistory;
+    }
+
+    async function saveMealHistoryToLocalStorage(userId, mealHistory) {
+        localStorage.setItem(userId, JSON.stringify(mealHistory));
+    }
+
     function handleManualEntry(foodName, calories) {
         return `<strong>${foodName}</strong> - Manual entry - ${calories} kcal`;
     }
 
     async function handleAPIEntry(foodName) {
         const foodResults = await searchUSDAFood(foodName);
+        console.log("Food results for", foodName, foodResults); // Debug
+
         if (foodResults.length > 0) {
             const selectedFood = foodResults[0];
-            const calories = selectedFood.foodNutrients.find(n => n.nutrientName.toLowerCase().includes("energy"))?.value || 0;
-            return `<strong>${foodName}</strong> - ${selectedFood.description} - ${calories} kcal`;
+            const description = selectedFood.description || "No description";
+
+            let calories = 0;
+            if (selectedFood.foodNutrients && Array.isArray(selectedFood.foodNutrients)) {
+                const energyNutrient = selectedFood.foodNutrients.find(n =>
+                    n.nutrientName.toLowerCase().includes("energy") && n.unitName === "KCAL"
+                );
+                if (energyNutrient) {
+                    calories = energyNutrient.value || 0;
+                }
+            }
+
+            return `<strong>${foodName}</strong> - ${description} - ${calories} kcal`;
         } else {
             return `<strong>${foodName}</strong> - No USDA data found`;
         }
     }
+
+    async function saveToFirestore(userId, date, data) {
+        try {
+            const userDocRef = doc(db, `Food Log/${userId}/Entries`, date); // Use the date as the document ID
+            await setDoc(userDocRef, data);
+            console.log("Data saved to Firestore:", data);
+        } catch (error) {
+            console.error("Error saving to Firestore:", error);
+        }
+    }
+
+    async function getMealHistoryFromFirestore(userId) {
+        try {
+            const entriesCollection = collection(db, `Food Log/${userId}/Entries`);
+            const querySnapshot = await getDocs(entriesCollection);
+
+            const history = {};
+            querySnapshot.forEach((doc) => {
+                history[doc.id] = doc.data(); // Use the document ID (date) as the key
+            });
+
+            return history;
+        } catch (error) {
+            console.error("Error fetching from Firestore:", error);
+            return null;
+        }
+    }
+
+    // This will handle saving meal data to localStorage and Firestore
+    async function handleMealHistory(user, date, entry) {
+        const userUid = user ? user.uid : null;
+        if (userUid) {
+            // Get the current history from LocalStorage
+            const storedHistory = await getMealHistoryFromLocalStorage(userUid);
+
+            // Add the new entry for the selected date
+            storedHistory[date] = entry;
+
+            // Save the updated meal history to localStorage
+            await saveMealHistoryToLocalStorage(userUid, storedHistory);
+
+            // Also save to Firestore
+            await saveToFirestore(userUid, date, entry);
+        }
+    }
+
+    // Set up the meal history after the user logs in
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userId = user.uid;
+            console.log("User logged in:", userId);
+
+            // Load all past meal entries from Firestore
+            const firestoreHistory = await getMealHistoryFromFirestore(userId);
+            if (firestoreHistory) {
+                mealHistory = firestoreHistory; // Populate mealHistory with Firestore data
+            }
+
+            updateMealHistory();
+            renderCalendar();
+        } else {
+            console.log("No user logged in");
+        }
+    });
 
     submitMealsButton.addEventListener("click", async () => {
         let mealHistoryEntry = "";
@@ -62,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     const apiEntry = await handleAPIEntry(entry);
                     mealHistoryEntry += apiEntry + "<br>";
-                    const apiCalories = apiEntry.match(/(\d+) kcal/);
+                    const apiCalories = apiEntry.match(/(\d+)\s*kcal/);
                     if (apiCalories) {
                         totalCalories += parseInt(apiCalories[1]);
                     }
@@ -75,7 +174,15 @@ document.addEventListener("DOMContentLoaded", () => {
             calories: totalCalories
         };
 
-        localStorage.setItem("mealHistory", JSON.stringify(mealHistory));
+        // Save to Firestore and localStorage
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                handleMealHistory(user, selectedDate, {
+                    meals: mealHistoryEntry,
+                    calories: totalCalories
+                });
+            }
+        });
 
         updateMealHistory();
         renderCalendar();
@@ -114,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (mealHistory[dateKey]) {
                 dayElement.classList.add("logged");
                 if (dateKey < todayFormatted) {
-                    dayElement.textContent = `${day} x`; // Mark past logged days with "x"
+                    dayElement.textContent = `${day} x`;
                 }
             }
 
@@ -128,7 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     renderCalendar();
-    updateMealHistory();
 });
+
+
+
 
 
