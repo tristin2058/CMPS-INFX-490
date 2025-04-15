@@ -37,11 +37,11 @@ function createTaskbar() {
                 transition: background-color 0.3s ease, transform 0.2s ease;
             }
 
-.taskbar-left:hover {
-  background-color: #63B3ED;
-  color: #0f2027;
-  transform: translateY(-1px);
-}
+            .taskbar-left:hover {
+                background-color: #63B3ED;
+                color: #0f2027;
+                transform: translateY(-1px);
+            }
             .nav-links {
                 display: flex;
                 gap: 25px;
