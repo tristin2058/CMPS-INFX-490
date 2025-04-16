@@ -29,6 +29,11 @@ const userEmailDisplay = document.getElementById("userEmail");
 // Previous state for undo functionality
 let previousExerciseState = {};
 
+// Function to format the date as YYYY-MM-DD
+function getFormattedDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 // Function to load and display saved exercise data
 const loadExerciseData = async () => {
     const user = auth.currentUser;
@@ -55,7 +60,8 @@ const saveExerciseData = async () => {
     }
 
     const exerciseType = exerciseTypeSelect.value;
-    const userDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise`, user.uid); // Use UID as document ID
+    const formattedDate = getFormattedDate(new Date()); // Use the formatted date
+    const userDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, formattedDate); // Use the formatted date as the document ID
 
     try {
         // Retrieve current data first
@@ -82,7 +88,7 @@ const saveExerciseData = async () => {
         // Prepare data to be saved based on exercise type
         let updatedData = {
             exercise: newExercise,
-            date: new Date().toISOString()
+            date: formattedDate
         };
 
         if (exerciseType === "Cardio") {
@@ -99,25 +105,6 @@ const saveExerciseData = async () => {
         await setDoc(userDocRef, updatedData, { merge: true });
 
         console.log("Cumulative data saved:", updatedData);
-
-        // Save historical exercise data
-        const formattedDate = new Date().toISOString();
-        const exerciseHistoryRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, formattedDate);
-        await setDoc(exerciseHistoryRef, {
-            exercise: newExercise,
-            duration: newDuration,
-            reps: newReps,
-            sets: newSets,
-            date: formattedDate
-        });
-
-        console.log("Historical data saved:", {
-            exercise: newExercise,
-            duration: newDuration,
-            reps: newReps,
-            sets: newSets,
-            date: formattedDate
-        });
 
         alert("Exercise data updated successfully!");
 
@@ -149,7 +136,6 @@ const undoLastExerciseEntry = async () => {
     }
 
     const exerciseType = exerciseTypeSelect.value;
-    const formattedDate = new Date().toISOString(); // Use the current date for reference
     const exerciseHistoryCollection = collection(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`);
 
     try {
@@ -190,6 +176,7 @@ const undoLastExerciseEntry = async () => {
 // Function to update input fields based on exercise type
 const updateInputFields = () => {
     const exerciseType = exerciseTypeSelect.value;
+
     if (exerciseType === "Cardio") {
         dynamicInputs.innerHTML = `
             <div class="input-box">
