@@ -24,7 +24,24 @@ function createTaskbar() {
                 top: 0;
                 z-index: 1000;
             }
+            .taskbar-left {
+                display: flex;
+                align-items: center;
+                color: #E2E8F0;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 25px;
+                white-space: nowrap;
+                padding: 10px;
+                border-radius: 5px;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
 
+            .taskbar-left:hover {
+                background-color: #63B3ED;
+                color: #0f2027;
+                transform: translateY(-1px);
+            }
             .nav-links {
                 display: flex;
                 gap: 25px;
@@ -124,10 +141,10 @@ function createTaskbar() {
             }
         </style>
         <div class="taskbar">
-            <div class="taskbar-left">
-                <img src="360_transparent.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
-                Thrive360
-            </div>
+            <a href="about.html" class="taskbar-left" style="display: flex; align-items: center; text-decoration: none;">
+                    <img src="360m.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
+                    <span>Thrive360</span>
+            </a>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <div class="dropdown">
