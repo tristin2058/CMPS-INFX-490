@@ -142,7 +142,7 @@ function createTaskbar() {
         </style>
         <div class="taskbar">
             <a href="about.html" class="taskbar-left" style="display: flex; align-items: center; text-decoration: none;">
-                    <img src="360_transparent.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
+                    <img src="360m.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
                     <span>Thrive360</span>
             </a>
             <div class="nav-links">
