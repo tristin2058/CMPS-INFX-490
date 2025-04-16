@@ -160,7 +160,19 @@
       </div>
     </section>
   </main>
+   <!-- Image URL handling -->
+   <script>
+    document.getElementById('applyImageURL').addEventListener('click', () => {
+      const imageUrl = document.getElementById('profileImageURL').value;
+      const profileImg = document.getElementById('profileImage');
 
+      if (imageUrl && imageUrl.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i)) {
+        profileImg.src = imageUrl;
+      } else {
+        alert('Please enter a valid image URL (ending in .jpg, .png, etc.)');
+      }
+    });
+  </script>
   <script type="module" src="profile.js"></script>
 </body>
 </html>

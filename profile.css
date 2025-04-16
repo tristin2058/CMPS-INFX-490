@@ -269,6 +269,27 @@ select option {
   width: 48%;
 }
 
+#profileImage {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+#profileImageInput,
+#profileImageURL,
+#applyImageURL {
+  display: block;
+  margin-top: 8px;
+  padding: 6px;
+  font-size: 14px;
+}
+
+#profileImageURL {
+  width: 100%;
+  box-sizing: border-box;
+}
 
 
 
