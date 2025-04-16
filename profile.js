@@ -46,6 +46,24 @@ const pronounsDisplay = document.getElementById("pronounsDisplay");
 const editPronouns = document.getElementById("editPronouns");
 const customPronounsInput = document.getElementById("customPronouns");
 
+const imageLinkInput = document.createElement("input");
+imageLinkInput.type = "text";
+imageLinkInput.placeholder = "Enter image URL";
+imageLinkInput.id = "imageLinkInput";
+profileImageInput.insertAdjacentElement("afterend", imageLinkInput);
+
+imageLinkInput.addEventListener("change", async () => {
+  const imageUrl = imageLinkInput.value.trim();
+  if (imageUrl) {
+    profileImage.src = imageUrl;
+    const user = auth.currentUser;
+    if (user) {
+      const docRef = doc(db, "profile", user.uid);
+      await updateDoc(docRef, { imageUrl });
+    }
+  }
+});
+
 let originalData = {};
 
 editBio.addEventListener("input", () => {
@@ -98,8 +116,6 @@ function updateDOM(data, user) {
   bmiStatusEl.textContent = status.label;
   bmiStatusEl.style.color = status.color;
 
-
-
   const pronouns = data.pronouns || "";
   pronounsDisplay.textContent = pronouns ? `(${pronouns})` : "";
   editPronouns.value = ["He/Him", "She/Her", "They/Them", "Any Pronouns"].includes(pronouns) ? pronouns : "Custom";
@@ -137,12 +153,16 @@ function updateDOM(data, user) {
     const registeredDate = new Date(data.registeredAt.seconds * 1000);
     registeredAtEl.textContent = registeredDate.toLocaleDateString();
   }
-  
+
   if (user?.metadata?.lastSignInTime) {
     const lastLoginDate = new Date(user.metadata.lastSignInTime);
     lastLoginEl.textContent = lastLoginDate.toLocaleDateString();
   }
-  
+
+  if (data.imageUrl) {
+    profileImage.src = data.imageUrl;
+    imageLinkInput.value = data.imageUrl;
+  }
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -164,136 +184,3 @@ onAuthStateChanged(auth, async (user) => {
     }
   });
 });
-
-if (profileImageInput) {
-  profileImageInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      profileImage.src = base64Image;
-
-      const user = auth.currentUser;
-      if (user) {
-        const docRef = doc(db, "profile", user.uid);
-        await updateDoc(docRef, { localImageBase64: base64Image });
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-editProfileButton.addEventListener("click", () => {
-  console.log("Edit button clicked");
-  toggleEdit(true);
-});
-
-saveProfileButton.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const ageVal = parseInt(editAge.value);
-  const weightVal = parseFloat(editWeight.value);
-  let heightVal, heightText;
-
-  if (heightUnit.value === "cm") {
-    heightVal = parseFloat(editHeightCm.value);
-    heightText = `${heightVal} cm`;
-  } else {
-    const ft = parseFloat(editHeightFt.value) || 0;
-    const inches = parseFloat(editHeightIn.value) || 0;
-    heightVal = (ft * 12) + inches;
-    heightText = `${(heightVal / 12).toFixed(2)} ft`;
-  }
-
-  const bioVal = editBio.value.trim().slice(0, 200);
-  const pronounsVal = editPronouns.value === "Custom" ? customPronounsInput.value.trim() : editPronouns.value;
-  const genderVal = editGender.value === "Other" ? customGenderInput.value.trim() : editGender.value.trim();
-
-  if (isNaN(ageVal) || isNaN(weightVal) || isNaN(heightVal)) {
-    alert("Please enter valid numbers for age, height, and weight.");
-    return;
-  }
-
-  const docRef = doc(db, "profile", user.uid);
-  const currentSnap = await getDoc(docRef);
-  const currentData = currentSnap.exists() ? currentSnap.data() : {};
-
-  const updatedData = {
-    displayName: currentData.displayName || user.displayName || "—",
-    username: currentData.username || user.email?.split("@")[0] || "—",
-    bio: bioVal,
-    age: ageVal,
-    height: heightText,
-    heightInInches: heightUnit.value === "cm" ? null : heightVal,
-    weight: `${weightVal} ${weightUnit.value}`,
-    gender: genderVal,
-    pronouns: pronounsVal
-  };
-
-  let heightMeters;
-  if (heightUnit.value === "cm") {
-    heightMeters = heightVal / 100;
-  } else {
-    heightMeters = updatedData.heightInInches * 0.0254;
-  }
-
-  if (heightMeters && weightVal) {
-    const weightKg = weightUnit.value === "lb" ? weightVal * 0.453592 : weightVal;
-    updatedData.bmi = (weightKg / (heightMeters * heightMeters)).toFixed(1);
-  }
-
-  try {
-    await updateDoc(docRef, updatedData);
-    updateDOM(updatedData, user);
-    toggleEdit(false);
-  } catch (err) {
-    console.error("Error saving:", err);
-    alert("Failed to save profile. Try again.");
-  }
-});
-
-cancelEditButton.addEventListener("click", () => {
-  updateDOM(originalData, auth.currentUser);
-  toggleEdit(false);
-});
-
-function toggleEdit(isEditing) {
-  const togglePair = (staticEl, editEl) => {
-    staticEl.parentElement.classList.toggle("show", !isEditing);
-    editEl.parentElement.classList.toggle("show", isEditing);
-  };
-
-  togglePair(bio, editBio);
-  togglePair(age, editAge);
-  togglePair(weight, editWeight);
-  togglePair(gender, editGender);
-  togglePair(pronounsDisplay, editPronouns);
-
-  const heightDisplay = height.closest(".fade-toggle");
-  const heightEdit = editHeightCm.closest(".fade-toggle");
-  if (heightDisplay && heightEdit) {
-    heightDisplay.classList.toggle("show", !isEditing);
-    heightEdit.classList.toggle("show", isEditing);
-  }
-
-  const weightDisplay = weight.closest(".fade-toggle");
-  const weightEdit = editWeight.closest(".fade-toggle");
-  if (weightDisplay && weightEdit) {
-    weightDisplay.classList.toggle("show", !isEditing);
-    weightEdit.classList.toggle("show", isEditing);
-  }
-
-  heightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
-  weightUnit.closest(".fade-toggle")?.classList.toggle("show", isEditing);
-  customPronounsInput.style.display = isEditing && editPronouns.value === "Custom" ? "block" : "none";
-  customGenderInput.style.display = isEditing && editGender.value === "Other" ? "block" : "none";
-
-  editProfileButton.style.display = isEditing ? "none" : "inline-block";
-  saveProfileButton.style.display = isEditing ? "inline-block" : "none";
-  cancelEditButton.style.display = isEditing ? "inline-block" : "none";
-}
-
-

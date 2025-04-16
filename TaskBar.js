@@ -161,7 +161,7 @@ function createTaskbar() {
                         <a href="ExerciseHistory.html">Exercise History</a>
                     </div>
                 </div>
-                <a href="Profile.html">Profile</a>
+                <a href="profile.html">Profile</a>
                 <a href="sign-in.html" class="sign-out">Sign Out</a>
             </div>
         </div>
