@@ -212,10 +212,9 @@ const muscleGroups = ["abdominals", "abductors", "adductors", "biceps", "calves"
     "lower_back", "middle_back", "neck", "quadriceps", "traps", "triceps"];
 const difficulties = ["beginner", "intermediate", "expert"];
 
-// Function to fetch exercises from the API
+// Function to fetch exercises from your backend API
 const fetchExercise = async () => {
-    const apiUrlBase = `https://api.api-ninjas.com/v1/exercises?`;
-    const apiKey = 'FczpYHvvGE/ZFZDn55+wvQ==vj8Ydg6keRgZUrX9';
+    const apiUrlBase = `/api/exercises?`;
     const queryParams = [];
 
     const name = document.getElementById("lookupExerciseName").value.trim();
@@ -238,14 +237,10 @@ const fetchExercise = async () => {
     const apiUrl = apiUrlBase + queryParams.join("&");
 
     try {
-        const response = await fetch(apiUrl, {
-            headers: { 'X-Api-Key': apiKey }
-        });
-
+        const response = await fetch(apiUrl);
         if (!response.ok) {
             throw new Error('Failed to fetch exercise data');
         }
-
         const exercises = await response.json();
         displayExercises(exercises);
     } catch (error) {
