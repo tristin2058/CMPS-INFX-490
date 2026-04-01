@@ -1,13 +1,4 @@
-// Import environment variables and OpenAI library
-import dotenv from 'dotenv';
-dotenv.config();
-
-import OpenAI from 'openai';
-
-// Initialize OpenAI client with the API key from the .env file
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+import openai from './openai-client.js';
 
 // Function to communicate with OpenAI's GPT model
 export async function chatWithGPT(messageHistory) {
