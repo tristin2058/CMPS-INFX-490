@@ -37,10 +37,10 @@ heightUnitSelect.addEventListener("change", () => {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const displayName = document.getElementById("displayName").value;
-  const username = document.getElementById("username").value;
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const displayName = document.getElementById("displayName").value || "";
+  const username = document.getElementById("username").value || "";
+  const email = document.getElementById("email").value || "";
+  const password = document.getElementById("password").value || "";
   const age = parseInt(document.getElementById("age").value);
   const gender =
     genderSelect.value === "Other"
@@ -55,31 +55,52 @@ form.addEventListener("submit", async (e) => {
 
   if (heightUnit === "cm") {
     const heightCm = parseFloat(heightCmInput.value);
-    heightMeters = heightCm / 100;
-    heightText = `${heightCm} cm`;
+    heightMeters = isNaN(heightCm) ? NaN : heightCm / 100;
+    heightText = isNaN(heightCm) ? "" : `${heightCm} cm`;
   } else {
     const ft = parseFloat(heightFtInput.value) || 0;
     const inches = parseFloat(heightInInput.value) || 0;
     const totalInches = (ft * 12) + inches;
-    heightMeters = totalInches * 0.0254;
-    heightText = `${(totalInches / 12).toFixed(2)} ft`;
+    heightMeters = totalInches > 0 ? totalInches * 0.0254 : NaN;
+    heightText = totalInches > 0 ? `${(totalInches / 12).toFixed(2)} ft` : "";
   }
 
-  let weightKg = weight;
-  if (weightUnit === "lb") weightKg = weight * 0.453592;
+  let weightKg = isNaN(weight) ? NaN : weight;
+  if (weightUnit === "lb" && !isNaN(weight)) weightKg = weight * 0.453592;
 
-  const bmi = (weightKg / (heightMeters ** 2)).toFixed(2);
+  const bmi = (!isNaN(weightKg) && !isNaN(heightMeters) && heightMeters > 0)
+    ? (weightKg / (heightMeters ** 2)).toFixed(2)
+    : "";
+
+  // Validation: collect errors and stop before creating user or writing to DB
+  const errors = [];
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!displayName.trim()) errors.push("Display name is required.");
+  if (!username.trim() || username.trim().length < 3) errors.push("Username must be at least 3 characters.");
+  if (!email.trim() || !emailRegex.test(email)) errors.push("A valid email is required.");
+  if (!password || password.length < 6) errors.push("Password must be at least 6 characters.");
+  if (isNaN(age) || age <= 0) errors.push("Enter a valid age.");
+  if (!gender || !gender.trim()) errors.push("Gender is required.");
+  if (isNaN(weight) || weight <= 0) errors.push("Enter a valid weight.");
+  if (isNaN(heightMeters) || heightMeters <= 0) errors.push("Enter a valid height.");
+
+  if (errors.length > 0) {
+    alert("Please fix the following errors:\n- " + errors.join("\n- "));
+    console.warn("Registration prevented due to validation errors:", errors);
+    return; // stop here; do not create user or write to DB
+  }
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const user = cred.user;
 
     await setDoc(doc(db, "profile", user.uid), {
-      displayName,
-      username,
-      email,
+      displayName: displayName.trim(),
+      username: username.trim(),
+      email: email.trim(),
       age,
-      gender,
+      gender: gender.trim(),
       height: heightText,
       weight: `${weight} ${weightUnit}`,
       bmi
