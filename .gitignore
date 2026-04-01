@@ -1,2 +1,2 @@
 #Ignore environment variable with API keys
-.env
+openai-chatbot/.env

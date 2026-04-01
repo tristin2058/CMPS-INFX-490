@@ -6,6 +6,8 @@ import openai from './openai-client.js';
 import fs from 'fs/promises';
 import path from 'path';
 
+dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 

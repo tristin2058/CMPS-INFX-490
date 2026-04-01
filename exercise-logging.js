@@ -31,6 +31,11 @@ const userEmailDisplay = document.getElementById("userEmail");
 // Previous state for undo functionality
 let previousExerciseState = {};
 
+// Function to format the date as YYYY-MM-DD
+function getFormattedDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 // Function to load and display saved exercise data
 const loadExerciseData = async () => {
     const user = auth.currentUser;
@@ -57,7 +62,8 @@ const saveExerciseData = async () => {
     }
 
     const exerciseType = exerciseTypeSelect.value;
-    const userDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise`, user.uid); // Use UID as document ID
+    const formattedDate = getFormattedDate(new Date()); // Use the formatted date
+    const userDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, formattedDate); // Use the formatted date as the document ID
 
     try {
         // Retrieve current data first
@@ -84,7 +90,7 @@ const saveExerciseData = async () => {
         // Prepare data to be saved based on exercise type
         let updatedData = {
             exercise: newExercise,
-            date: new Date().toISOString()
+            date: formattedDate
         };
 
         if (exerciseType === "Cardio") {
@@ -101,25 +107,6 @@ const saveExerciseData = async () => {
         await setDoc(userDocRef, updatedData, { merge: true });
 
         console.log("Cumulative data saved:", updatedData);
-
-        // Save historical exercise data
-        const formattedDate = new Date().toISOString();
-        const exerciseHistoryRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, formattedDate);
-        await setDoc(exerciseHistoryRef, {
-            exercise: newExercise,
-            duration: newDuration,
-            reps: newReps,
-            sets: newSets,
-            date: formattedDate
-        });
-
-        console.log("Historical data saved:", {
-            exercise: newExercise,
-            duration: newDuration,
-            reps: newReps,
-            sets: newSets,
-            date: formattedDate
-        });
 
         alert("Exercise data updated successfully!");
 
@@ -198,6 +185,7 @@ const undoLastExerciseEntry = async () => {
 // Function to update input fields based on exercise type
 const updateInputFields = () => {
     const exerciseType = exerciseTypeSelect.value;
+
     if (exerciseType === "Cardio") {
         dynamicInputs.innerHTML = `
             <div class="input-box">
@@ -233,10 +221,9 @@ const muscleGroups = ["abdominals", "abductors", "adductors", "biceps", "calves"
     "lower_back", "middle_back", "neck", "quadriceps", "traps", "triceps"];
 const difficulties = ["beginner", "intermediate", "expert"];
 
-// Function to fetch exercises from the API
+// Function to fetch exercises from your backend API
 const fetchExercise = async () => {
-    const apiUrlBase = `https://api.api-ninjas.com/v1/exercises?`;
-    const apiKey = 'FczpYHvvGE/ZFZDn55+wvQ==vj8Ydg6keRgZUrX9';
+    const apiUrlBase = `/api/exercises?`;
     const queryParams = [];
 
     const name = document.getElementById("lookupExerciseName").value.trim();
@@ -259,14 +246,10 @@ const fetchExercise = async () => {
     const apiUrl = apiUrlBase + queryParams.join("&");
 
     try {
-        const response = await fetch(apiUrl, {
-            headers: { 'X-Api-Key': apiKey }
-        });
-
+        const response = await fetch(apiUrl);
         if (!response.ok) {
             throw new Error('Failed to fetch exercise data');
         }
-
         const exercises = await response.json();
         displayExercises(exercises);
     } catch (error) {

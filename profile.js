@@ -46,6 +46,24 @@ const pronounsDisplay = document.getElementById("pronounsDisplay");
 const editPronouns = document.getElementById("editPronouns");
 const customPronounsInput = document.getElementById("customPronouns");
 
+const imageLinkInput = document.createElement("input");
+imageLinkInput.type = "text";
+imageLinkInput.placeholder = "Enter image URL";
+imageLinkInput.id = "imageLinkInput";
+profileImageInput.insertAdjacentElement("afterend", imageLinkInput);
+
+imageLinkInput.addEventListener("change", async () => {
+  const imageUrl = imageLinkInput.value.trim();
+  if (imageUrl) {
+    profileImage.src = imageUrl;
+    const user = auth.currentUser;
+    if (user) {
+      const docRef = doc(db, "profile", user.uid);
+      await updateDoc(docRef, { imageUrl });
+    }
+  }
+});
+
 let originalData = {};
 
 editBio.addEventListener("input", () => {
@@ -185,10 +203,7 @@ if (profileImageInput) {
   });
 }
 
-editProfileButton.addEventListener("click", () => {
-  console.log("Edit button clicked");
-  toggleEdit(true);
-});
+editProfileButton.addEventListener("click", () => toggleEdit(true));
 
 saveProfileButton.addEventListener("click", async () => {
   const user = auth.currentUser;
@@ -295,5 +310,3 @@ function toggleEdit(isEditing) {
   saveProfileButton.style.display = isEditing ? "inline-block" : "none";
   cancelEditButton.style.display = isEditing ? "inline-block" : "none";
 }
-
-

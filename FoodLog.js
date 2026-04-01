@@ -22,18 +22,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let totalCalories = 0;
     let selectedDate = getFormattedDate(new Date());
-    let mealHistory = {}; // Stores meals for the current session
-
-    const USDA_API_KEY = "TlJi5aBkuJ2ur7CEppmSTrKsCKCdNftjRWJhLrd5";
-    const USDA_API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search";
+    let mealHistory = {}; // Stores meals for the current sessionr
 
     function getFormattedDate(date) {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     }
 
+    // Updated: Use backend proxy for USDA food search
     async function searchUSDAFood(query) {
         try {
-            const response = await fetch(`${USDA_API_URL}?query=${query}&api_key=${USDA_API_KEY}`);
+            const response = await fetch(`/api/foodsearch?query=${encodeURIComponent(query)}`);
             const data = await response.json();
             return data.foods || [];
         } catch (error) {
