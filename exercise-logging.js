@@ -9,8 +9,10 @@ import {
     getDoc,
     setDoc,
     getDocs,
-    addDoc,
-    deleteDoc
+    deleteDoc,
+    query,
+    orderBy,
+    limit
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Select input fields and buttons
@@ -63,13 +65,13 @@ const saveExerciseData = async () => {
         let currentData = userSnap.exists() ? userSnap.data() : {};
 
         // Parse existing values, default to 0 if missing
-        let previousDuration = parseInt(currentData.duration) || 0;
+        let previousDuration = parseFloat(currentData.duration) || 0;
         let previousReps = parseInt(currentData.reps) || 0;
         let previousSets = parseInt(currentData.sets) || 0;
 
         // Get new values from input fields
         let newExercise = document.getElementById("exercise").value || "None";
-        let newDuration = parseInt(document.getElementById("duration")?.value) || 0;
+        let newDuration = parseFloat(document.getElementById("duration")?.value) || 0;
         let newReps = parseInt(document.getElementById("reps")?.value) || 0;
         let newSets = parseInt(document.getElementById("sets")?.value) || 0;
 
@@ -149,38 +151,44 @@ const undoLastExerciseEntry = async () => {
     }
 
     const exerciseType = exerciseTypeSelect.value;
-    const formattedDate = new Date().toISOString(); // Use the current date for reference
     const exerciseHistoryCollection = collection(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`);
+    const userDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise`, user.uid);
 
     try {
-        // Fetch the most recent entry
-        const querySnapshot = await getDocs(exerciseHistoryCollection);
+        const latestEntryQuery = query(exerciseHistoryCollection, orderBy("date", "desc"), limit(1));
+        const querySnapshot = await getDocs(latestEntryQuery);
+
         if (querySnapshot.empty) {
             alert("No entries to undo.");
             return;
         }
 
-        // Find the most recent entry
-        let mostRecentDoc = null;
-        querySnapshot.forEach((doc) => {
-            if (!mostRecentDoc || doc.id > mostRecentDoc.id) {
-                mostRecentDoc = doc;
-            }
-        });
+        const mostRecentDoc = querySnapshot.docs[0];
+        const mostRecentEntry = mostRecentDoc.data();
+        const userSnap = await getDoc(userDocRef);
+        const currentData = userSnap.exists() ? userSnap.data() : {};
+        const updatedData = {};
 
-        if (mostRecentDoc) {
-            // Delete the most recent entry
-            const mostRecentDocRef = doc(db, `Exercise Log/${exerciseType}/User's Exercise/${user.uid}/Exercises`, mostRecentDoc.id);
-            await deleteDoc(mostRecentDocRef);
-
-            alert("Last exercise entry undone successfully!");
-
-            // Hide the undo button
-            undoExerciseButton.style.display = "none";
-
-        } else {
-            alert("No entries to undo.");
+        if (exerciseType === "Cardio") {
+            const currentDuration = parseFloat(currentData.duration) || 0;
+            const entryDuration = parseFloat(mostRecentEntry.duration) || 0;
+            updatedData.duration = Math.max(currentDuration - entryDuration, 0);
+        } else if (exerciseType === "Workouts") {
+            const currentReps = parseInt(currentData.reps) || 0;
+            const currentSets = parseInt(currentData.sets) || 0;
+            const entryReps = parseInt(mostRecentEntry.reps) || 0;
+            const entrySets = parseInt(mostRecentEntry.sets) || 0;
+            updatedData.reps = Math.max(currentReps - entryReps, 0);
+            updatedData.sets = Math.max(currentSets - entrySets, 0);
         }
+
+        await deleteDoc(mostRecentDoc.ref);
+        await setDoc(userDocRef, updatedData, { merge: true });
+
+        const remainingEntriesSnapshot = await getDocs(latestEntryQuery);
+        undoExerciseButton.style.display = remainingEntriesSnapshot.empty ? "none" : "inline-block";
+
+        alert("Last exercise entry undone successfully!");
     } catch (error) {
         console.error("Error undoing last exercise entry: ", error);
         alert("Failed to undo last exercise entry.");
@@ -381,7 +389,6 @@ onAuthStateChanged(auth, (user) => {
 // Attach event listeners to buttons
 saveExerciseButton.addEventListener("click", saveExerciseData);
 undoExerciseButton.addEventListener("click", undoLastExerciseEntry);
-exerciseTypeSelect.addEventListener("change", updateInputFields);
 
 // Initialize input fields based on default exercise type
 updateInputFields();

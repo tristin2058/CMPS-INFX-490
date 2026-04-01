@@ -1,42 +1,36 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import path from 'path';
 import { fileURLToPath } from 'url';
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
 import { chatWithGPT } from './chatbot.js';
+import openai from './openai-client.js';
 import fs from 'fs/promises';
-import pathModule from 'path';
-import OpenAI from 'openai';
-
-dotenv.config();
+import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Resolve the root directory (CMPS-INFX-490)
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.resolve(path.dirname(__filename), '../..'); // Go up to CMPS-INFX-490
+const ROOT_DIR = path.resolve(path.dirname(__filename), '../..'); // Go up to CMPS-INFX-490
 
 // Serve static files from the root directory
-app.use(express.static(__dirname));
+app.use(express.static(ROOT_DIR));
 
 // --- Simple local vector store for page code retrieval ---
-const VECTOR_STORE_PATH = pathModule.join(__dirname, 'vector_store.json');
+const VECTOR_STORE_PATH = path.join(ROOT_DIR, 'vector_store.json');
 const EMBEDDING_MODEL = 'text-embedding-3-small';
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 let VECTOR_STORE = null; // in-memory cache
 
 async function fileListRecursive(dir, exts = ['.html', '.js', '.css']) {
     const entries = await fs.readdir(dir, { withFileTypes: true });
     const files = [];
     for (const ent of entries) {
-        const full = pathModule.join(dir, ent.name);
+        const full = path.join(dir, ent.name);
         if (ent.isDirectory()) {
             if (ent.name === 'node_modules' || ent.name === '.git') continue;
             files.push(...await fileListRecursive(full, exts));
         } else {
-            if (exts.includes(pathModule.extname(ent.name).toLowerCase())) files.push(full);
+            if (exts.includes(path.extname(ent.name).toLowerCase())) files.push(full);
         }
     }
     return files;
@@ -53,31 +47,44 @@ function chunkText(text, maxChars = 1000) {
 }
 
 async function createEmbeddingsForFiles(rootDir) {
-    // If vector store file exists, load and return
+    // If vector store file exists, try loading it.
     try {
         const existing = await fs.readFile(VECTOR_STORE_PATH, 'utf8');
         VECTOR_STORE = JSON.parse(existing);
-        console.log('Loaded existing vector store with', VECTOR_STORE.length, 'items');
-        return;
+        if (Array.isArray(VECTOR_STORE) && VECTOR_STORE.length > 0) {
+            console.log('Loaded existing vector store with', VECTOR_STORE.length, 'items');
+            return;
+        }
+        console.warn('Existing vector store is empty or invalid; rebuilding embeddings.');
     } catch (err) {
         // continue to create
     }
 
     const files = await fileListRecursive(rootDir);
+    console.log('Embedding files count:', files.length, 'from', rootDir);
     const store = [];
     for (const filePath of files) {
         try {
             const raw = await fs.readFile(filePath, 'utf8');
             const chunks = chunkText(raw, 1200);
             for (let i = 0; i < chunks.length; i++) {
-                const text = `FILE: ${pathModule.relative(rootDir, filePath)}\nCHUNK_INDEX: ${i}\n` + chunks[i];
+                const text = `FILE: ${path.relative(rootDir, filePath)}\nCHUNK_INDEX: ${i}\n` + chunks[i];
                 // create embedding
                 const resp = await openai.embeddings.create({ model: EMBEDDING_MODEL, input: text });
+                if (!resp?.data?.[0]?.embedding) {
+                    throw new Error(`OpenAI returned no embedding for ${filePath} chunk ${i}`);
+                }
                 const embedding = resp.data[0].embedding;
-                store.push({ id: `${filePath}#${i}`, file: pathModule.relative(rootDir, filePath), chunkIndex: i, text, embedding });
+                store.push({ id: `${filePath}#${i}`, file: path.relative(rootDir, filePath), chunkIndex: i, text, embedding });
             }
         } catch (err) {
-            console.warn('Failed reading/embedding', filePath, err.message);
+            const authError = err?.response?.status === 401 || err?.status === 401 || /incorrect api key/i.test(err?.message || '');
+            if (authError) {
+                console.error('OpenAI authentication failed while creating embeddings. Please verify OPENAI_API_KEY in your .env file.');
+                console.error(err);
+                throw err;
+            }
+            console.warn('Failed reading/embedding', filePath, err?.message || err);
         }
     }
 
@@ -106,8 +113,8 @@ async function retrieveRelevant(query, topK = 5) {
     return scored.slice(0, topK).map(s => ({ score: s.score, text: s.item.text, file: s.item.file }));
 }
 
-// Start ingestion in background (root is two levels up from src)
-createEmbeddingsForFiles(pathModule.resolve(__dirname, '..', '..')).catch(err => console.error('Ingest error', err));
+// Start ingestion in background from the workspace root
+createEmbeddingsForFiles(ROOT_DIR).catch(err => console.error('Ingest error', err));
 
 // Helper to force re-ingestion (remove existing store and recreate)
 async function reingestFiles(rootDir) {
@@ -122,7 +129,7 @@ async function reingestFiles(rootDir) {
 // Reingest endpoint: POST /reingest
 app.post('/reingest', async (req, res) => {
     try {
-        await reingestFiles(pathModule.resolve(__dirname, '..', '..'));
+        await reingestFiles(ROOT_DIR);
         return res.json({ ok: true, items: VECTOR_STORE ? VECTOR_STORE.length : 0 });
     } catch (err) {
         console.error('Reingest error', err);
@@ -132,7 +139,7 @@ app.post('/reingest', async (req, res) => {
 
 // Serve sign-in.html on root
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'sign-in.html'));
+    res.sendFile(path.join(ROOT_DIR, 'sign-in.html'));
 });
 
 // Parse JSON request bodies
@@ -205,6 +212,14 @@ app.get('/api/foodsearch', async (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Please stop the existing process or set a different PORT.`);
+        process.exit(1);
+    }
+    console.error('Server error:', error);
 });
